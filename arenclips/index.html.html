@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArenaClips</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, deleteDoc, doc, updateDoc, onSnapshot, query, orderBy, serverTimestamp, getDoc, setDoc, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = { apiKey:"AIzaSyB5YH9YKclCxoFx5XIQS7Hzhwz5gP205VY", authDomain:"family-gallery-ca12f.firebaseapp.com", projectId:"family-gallery-ca12f", storageBucket:"family-gallery-ca12f.firebasestorage.app", messagingSenderId:"936913593884", appId:"1:936913593884:web:b2075fab1a0268c0a9e1d9" };
+  const app = initializeApp(cfg);
+  window._db = getFirestore(app);
+  window._auth = getAuth(app);
+  window._gp = new GoogleAuthProvider();
+  window._fb = { collection, addDoc, deleteDoc, doc, updateDoc, onSnapshot, query, orderBy, serverTimestamp, getDoc, setDoc, where, getDocs };
+  window._au = { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile };
+  window._ready = true;
+  window.dispatchEvent(new Event('fbready'));
+</script>
+<style>
+:root{--bg:#080c18;--s1:#0d1220;--s2:#111827;--s3:#1a2235;--br:rgba(255,255,255,0.07);--tx:#e8f0ff;--mu:#4a6080;--gr:#00f5a0;--bl:#00b4ff;--rd:#ff4040;--pu:#b464ff;--r:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:9000;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);}
+
+/* AUTH */
+#authScreen{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;align-items:center;justify-content:center;}
+.auth-box{background:var(--s1);border:1px solid var(--br);border-radius:16px;padding:36px;width:90%;max-width:400px;text-align:center;}
+.auth-logo{font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;margin-bottom:4px;}
+.auth-logo .a{color:var(--gr);}.auth-logo .c{color:var(--bl);}
+.auth-sub{font-size:.82rem;color:var(--mu);margin-bottom:22px;}
+.auth-tabs{display:flex;background:var(--s2);border-radius:8px;padding:3px;margin-bottom:18px;}
+.auth-tab{flex:1;padding:8px;border:none;background:none;color:var(--mu);font-size:.82rem;font-family:'Inter',sans-serif;cursor:pointer;border-radius:6px;transition:all .15s;}
+.auth-tab.active{background:var(--s1);color:var(--tx);}
+.auth-input{width:100%;background:var(--s2);border:1px solid var(--br);border-radius:8px;color:var(--tx);padding:10px 14px;font-size:.85rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:10px;}
+.auth-input:focus{border-color:var(--gr);}
+.abtn{width:100%;padding:11px;border:none;border-radius:8px;font-size:.88rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:8px;}
+.abtn-g{background:var(--gr);color:#001a0e;}
+.abtn-gg{background:var(--s2);color:var(--tx);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;gap:8px;}
+.auth-div{display:flex;align-items:center;gap:10px;margin:10px 0;color:var(--mu);font-size:.75rem;}
+.auth-div::before,.auth-div::after{content:'';flex:1;height:1px;background:var(--br);}
+.auth-err{color:var(--rd);font-size:.76rem;margin-top:4px;min-height:16px;}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:var(--s1);border-bottom:1px solid var(--br);position:sticky;top:0;z-index:500;}
+.logo{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;letter-spacing:1px;}
+.logo .a{color:var(--gr);}.logo .c{color:var(--bl);}
+.logo-tag{font-size:.6rem;color:var(--mu);font-family:'Inter',sans-serif;margin-left:2px;}
+.hnav{display:flex;gap:2px;}
+.ntab{padding:5px 13px;border-radius:6px;font-size:.78rem;color:var(--mu);cursor:pointer;transition:all .15s;font-weight:500;border:none;background:none;font-family:'Inter',sans-serif;}
+.ntab:hover{color:var(--tx);background:var(--s2);}
+.ntab.active{color:var(--gr);background:rgba(0,245,160,0.08);}
+.hright{display:flex;gap:8px;align-items:center;}
+.livebadge{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;background:rgba(255,64,64,0.08);border:1px solid rgba(255,64,64,0.2);font-size:.72rem;color:#ff6060;}
+.ldot{width:6px;height:6px;border-radius:50%;background:var(--rd);animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:7px;font-size:.8rem;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'Inter',sans-serif;}
+.btng{background:var(--gr);color:#001a0e;}.btng:hover{background:#00ffaa;}
+.btnb{background:var(--bl);color:#001020;}.btnb:hover{background:#22c5ff;}
+.btnd{background:transparent;color:var(--mu);border:1px solid var(--br);}.btnd:hover{background:var(--s2);color:var(--tx);}
+.btnr{background:var(--rd);color:#fff;}
+
+/* RANK BADGES */
+.rbadge{font-size:.62rem;padding:2px 7px;border-radius:10px;font-weight:600;}
+.r-owner{background:rgba(255,200,0,0.15);color:#ffd700;border:1px solid rgba(255,200,0,0.3);}
+.r-admin{background:rgba(255,64,64,0.15);color:#ff6060;border:1px solid rgba(255,64,64,0.3);}
+.r-mod{background:rgba(0,180,255,0.15);color:var(--bl);border:1px solid rgba(0,180,255,0.3);}
+.r-member{background:rgba(100,100,120,0.15);color:var(--mu);border:1px solid var(--br);}
+.uinitials{width:30px;height:30px;border-radius:50%;background:var(--s3);border:2px solid var(--gr);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:600;color:var(--gr);}
+.notif-bell{position:relative;cursor:pointer;font-size:1.2rem;padding:4px;}
+.notif-count{position:absolute;top:0;right:0;background:var(--rd);color:#fff;border-radius:50%;width:14px;height:14px;font-size:.55rem;display:none;align-items:center;justify-content:center;}
+.notif-count.show{display:flex;}
+
+/* LAYOUT */
+.appbody{display:flex;min-height:calc(100vh - 56px);}
+.sidebar{width:196px;min-width:196px;background:var(--s1);border-right:1px solid var(--br);padding:14px 0;overflow-y:auto;}
+.slabel{font-size:.63rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);padding:0 14px 6px;}
+.ssec{margin-bottom:20px;}
+.sitem{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:.79rem;color:var(--mu);cursor:pointer;border-left:2px solid transparent;transition:all .12s;}
+.sitem:hover{color:var(--tx);background:var(--s2);}
+.sitem.active{color:var(--gr);border-left-color:var(--gr);background:rgba(0,245,160,0.05);}
+.sbadge{margin-left:auto;background:var(--s3);border-radius:20px;padding:1px 7px;font-size:.66rem;color:var(--mu);}
+.sitem.active .sbadge{background:rgba(0,245,160,0.12);color:var(--gr);}
+.gdot{width:7px;height:7px;border-radius:2px;flex-shrink:0;}
+
+/* MAIN */
+.main{flex:1;padding:22px;overflow-y:auto;}
+.tcon{display:none;}.tcon.active{display:block;}
+.sechdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sectitle{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:600;letter-spacing:.4px;}
+
+/* STATS */
+.statsrow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.statcard{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);padding:13px 15px;position:relative;overflow:hidden;}
+.statcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.statcard.g::before{background:var(--gr);}.statcard.b::before{background:var(--bl);}
+.statlabel{font-size:.7rem;color:var(--mu);margin-bottom:5px;}
+.statval{font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;}
+.statval.g{color:var(--gr);}.statval.b{color:var(--bl);}
+
+/* DROPZONE */
+.dropzone{border:2px dashed rgba(0,245,160,0.2);border-radius:12px;padding:28px;text-align:center;margin-bottom:20px;color:var(--mu);font-size:.84rem;cursor:pointer;transition:all .2s;background:rgba(0,245,160,0.02);}
+.dropzone:hover,.dropzone.drag-over{border-color:var(--gr);background:rgba(0,245,160,0.06);color:var(--gr);}
+
+/* UPLOAD BAR */
+.upbar{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);padding:13px 15px;margin-bottom:14px;display:none;}
+.upbar.show{display:block;}
+.upbar-lbl{font-size:.78rem;color:var(--tx);margin-bottom:7px;display:flex;justify-content:space-between;}
+.ptrack{height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--gr),var(--bl));border-radius:2px;width:0%;transition:width .3s;}
+
+/* GRID */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px;margin-bottom:22px;}
+.ccard{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .15s;position:relative;}
+.ccard:hover{border-color:rgba(0,245,160,0.3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+.cthumb{width:100%;padding-top:56.25%;position:relative;background:var(--s3);overflow:hidden;}
+.cthumb video,.cthumb img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
+.coverlay{position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;}
+.ccard:hover .coverlay{opacity:1;}
+.playbtn{width:42px;height:42px;border-radius:50%;background:rgba(0,245,160,0.9);display:flex;align-items:center;justify-content:center;}
+.playtri{width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:13px solid #001a0e;margin-left:3px;}
+.cbadge{position:absolute;top:6px;left:6px;font-size:.62rem;padding:2px 7px;border-radius:4px;font-weight:600;}
+.bc{background:rgba(0,245,160,0.18);color:var(--gr);border:1px solid rgba(0,245,160,0.3);}
+.bs{background:rgba(180,100,255,0.18);color:var(--pu);border:1px solid rgba(180,100,255,0.3);}
+.bh{background:rgba(0,180,255,0.18);color:var(--bl);border:1px solid rgba(0,180,255,0.3);}
+.cinfo{padding:9px 11px;}
+.ctitle{font-size:.82rem;font-weight:500;color:var(--tx);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmeta{font-size:.7rem;color:var(--mu);display:flex;justify-content:space-between;align-items:center;}
+.cacts{position:absolute;top:5px;right:5px;display:flex;gap:3px;opacity:0;transition:opacity .15s;}
+.ccard:hover .cacts{opacity:1;}
+.cact{width:24px;height:24px;border-radius:4px;background:rgba(0,0,0,0.75);border:none;cursor:pointer;color:#fff;font-size:.72rem;display:flex;align-items:center;justify-content:center;transition:background .12s;}
+.cact:hover{background:rgba(255,64,64,0.85);}
+.likebtn{background:none;border:none;cursor:pointer;font-size:.78rem;padding:0;display:flex;align-items:center;gap:3px;color:var(--mu);transition:color .12s;}
+.likebtn.liked{color:#ff4060;}
+
+/* SHOT GRID */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:11px;}
+.scard{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .15s;}
+.scard:hover{border-color:rgba(180,100,255,0.4);transform:translateY(-2px);}
+.sthumb{width:100%;padding-top:75%;position:relative;background:var(--s3);overflow:hidden;}
+.sthumb img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
+.sinfo{padding:7px 9px;}
+.stitle{font-size:.78rem;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sdate{font-size:.68rem;color:var(--mu);margin-top:2px;}
+
+/* DRAFT OVERLAY */
+.draft-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;z-index:2;}
+.draft-label{font-size:.72rem;color:#ffcc00;font-weight:600;background:rgba(0,0,0,0.6);padding:3px 10px;border-radius:20px;}
+
+/* LIGHTBOX */
+.lbox{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;flex-direction:column;}
+.lbox.open{display:flex;}
+.lbclose{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--mu);font-size:1.5rem;cursor:pointer;}
+.lbnav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:1.5rem;padding:11px 15px;cursor:pointer;border-radius:var(--r);}
+.lbnav:hover{background:rgba(255,255,255,0.2);}
+.lbprev{left:14px;}.lbnext{right:14px;}
+.lbmedia{max-width:90vw;max-height:76vh;border-radius:var(--r);}
+.lbinfo{text-align:center;margin-top:12px;}
+.lbtitle{font-size:.88rem;color:var(--tx);}
+.lbmeta{font-size:.72rem;color:var(--mu);margin-top:3px;}
+.lbacts{display:flex;gap:7px;margin-top:10px;justify-content:center;}
+
+/* RECORDER */
+.recpanel{background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:22px;margin-bottom:20px;}
+.rechdr{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.recicon{width:46px;height:46px;border-radius:12px;background:rgba(255,64,64,0.1);border:1px solid rgba(255,64,64,0.2);display:flex;align-items:center;justify-content:center;}
+.reccircle{width:16px;height:16px;border-radius:50%;background:var(--rd);}
+.rectitle{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:600;}
+.recsub{font-size:.75rem;color:var(--mu);margin-top:2px;}
+.recopts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.recopt{border:1px solid var(--br);border-radius:var(--r);padding:12px;cursor:pointer;text-align:center;transition:all .15s;}
+.recopt:hover{border-color:var(--gr);background:rgba(0,245,160,0.04);}
+.recopt.selected{border-color:var(--gr);background:rgba(0,245,160,0.08);}
+.recopticon{font-size:1.4rem;margin-bottom:5px;}
+.recoptlbl{font-size:.78rem;font-weight:500;color:var(--tx);}
+.recoptsub{font-size:.68rem;color:var(--mu);margin-top:2px;}
+.recacts{display:flex;gap:8px;align-items:center;}
+.rectimer{font-family:'Rajdhani',sans-serif;font-size:1.7rem;font-weight:700;color:var(--rd);display:none;margin-left:auto;}
+.rectimer.show{display:block;}
+#recPreview{width:100%;border-radius:var(--r);margin-top:14px;display:none;background:#000;max-height:260px;}
+#recPreview.show{display:block;}
+
+/* STREAM */
+.streampanel{background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:22px;}
+.streampreview{width:100%;border-radius:var(--r);background:#000;height:260px;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:.88rem;margin-bottom:18px;position:relative;overflow:hidden;}
+.streampreview video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
+.streampreview video.show{display:block;}
+.streamctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.streaminfo{margin-left:auto;display:flex;gap:14px;font-size:.75rem;color:var(--mu);}
+.streamstat{display:flex;align-items:center;gap:4px;}
+.streamstat span{color:var(--tx);font-weight:500;}
+
+/* FACECAM */
+#facecam{position:fixed;bottom:110px;right:22px;z-index:9800;width:148px;height:94px;border-radius:10px;overflow:hidden;border:2px solid var(--gr);display:none;cursor:move;box-shadow:0 4px 20px rgba(0,0,0,0.6);}
+#facecam.show{display:block;}
+#facecam video{width:100%;height:100%;object-fit:cover;display:block;}
+#fcClose{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:4px;background:rgba(0,0,0,0.7);border:none;color:#fff;font-size:.6rem;cursor:pointer;z-index:2;}
+
+/* CHAT */
+.chatbox{position:fixed;bottom:110px;z-index:9800;width:280px;background:var(--s1);border:1px solid var(--br);border-radius:14px;display:none;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
+.chatbox.show{display:flex;}
+#globalChat{left:22px;}
+#staffChat{left:320px;}
+.chathdr{padding:9px 13px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;}
+.chathtitle{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:600;}
+.chatclose{background:none;border:none;color:var(--mu);cursor:pointer;font-size:.95rem;}
+.chatmsgs{height:200px;overflow-y:auto;padding:9px;display:flex;flex-direction:column;gap:5px;}
+.chatmsg{font-size:.76rem;line-height:1.4;}
+.cmsgname{font-weight:600;margin-right:4px;}
+.cmsgname.owner{color:#ffd700;}.cmsgname.admin{color:var(--rd);}.cmsgname.mod{color:var(--bl);}.cmsgname.member{color:var(--gr);}
+.chatinrow{display:flex;gap:5px;padding:7px 9px;border-top:1px solid var(--br);}
+.chatin{flex:1;background:var(--s2);border:1px solid var(--br);border-radius:6px;color:var(--tx);padding:5px 9px;font-size:.76rem;font-family:'Inter',sans-serif;outline:none;}
+.chatin:focus{border-color:var(--gr);}
+.chatsend{background:var(--gr);border:none;border-radius:6px;color:#001a0e;padding:5px 9px;font-size:.76rem;font-weight:600;cursor:pointer;}
+
+/* CHAT TOGGLES */
+.chat-toggle-bar{position:fixed;bottom:66px;left:0;right:0;z-index:9700;display:flex;gap:8px;padding:0 14px;pointer-events:none;}
+.ctoggle{pointer-events:all;background:var(--s1);border:1px solid var(--br);border-radius:20px;padding:6px 14px;cursor:pointer;font-size:.76rem;color:var(--tx);display:flex;align-items:center;gap:5px;box-shadow:0 2px 12px rgba(0,0,0,0.4);}
+.ctoggle .cunread{background:var(--rd);color:#fff;border-radius:50%;width:15px;height:15px;font-size:.55rem;display:none;align-items:center;justify-content:center;margin-left:2px;}
+.ctoggle .cunread.show{display:flex;}
+
+/* GAME SERVERS */
+.gamewrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px;margin-bottom:18px;}
+.gamecard{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .15s;text-align:center;}
+.gamecard:hover{transform:translateY(-2px);border-color:rgba(0,245,160,0.3);}
+.gamecard.active{border-color:var(--gr);background:rgba(0,245,160,0.05);}
+.gameicon{font-size:1.9rem;margin-bottom:5px;}
+.gamename{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:600;margin-bottom:2px;}
+.gamesub{font-size:.68rem;color:var(--mu);}
+.srvlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:7px;margin-bottom:14px;}
+.srvitem{background:var(--s1);border:1px solid var(--br);border-radius:var(--r);padding:9px 11px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;font-size:.77rem;color:var(--mu);}
+.srvitem:hover{border-color:var(--bl);color:var(--tx);}
+.srvitem.active{border-color:var(--gr);background:rgba(0,245,160,0.06);color:var(--gr);}
+.srvdot{width:7px;height:7px;border-radius:50%;background:var(--gr);flex-shrink:0;}
+.srvplayers{font-size:.65rem;color:var(--mu);margin-left:auto;}
+
+/* NOTIFICATIONS */
+#notifPanel{position:fixed;top:62px;right:14px;z-index:9990;width:290px;background:var(--s1);border:1px solid var(--br);border-radius:14px;display:none;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-height:380px;overflow-y:auto;}
+#notifPanel.show{display:block;}
+.notifhdr{padding:11px 15px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;font-family:'Rajdhani',sans-serif;font-size:.92rem;font-weight:600;}
+.notifitem{padding:9px 15px;border-bottom:1px solid var(--br);font-size:.76rem;color:var(--mu);display:flex;align-items:center;gap:7px;}
+.notifitem.unread{background:rgba(0,245,160,0.04);color:var(--tx);}
+
+/* LEADERBOARD */
+.lbrow{display:flex;align-items:center;gap:11px;padding:10px 13px;background:var(--s1);border:1px solid var(--br);border-radius:var(--r);margin-bottom:7px;}
+.lbnum{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;width:26px;text-align:center;}
+.lbnum.gold{color:#ffd700;}.lbnum.silver{color:#c0c0c0;}.lbnum.bronze{color:#cd7f32;}
+.lbuinfo{flex:1;}
+.lbuname{font-size:.83rem;font-weight:500;}
+.lbustat{font-size:.7rem;color:var(--mu);}
+.lbscore{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--gr);}
+
+/* ANNOUNCEMENTS */
+.anncard{background:rgba(255,200,0,0.05);border:1px solid rgba(255,200,0,0.2);border-radius:var(--r);padding:13px 15px;margin-bottom:11px;}
+.anntitle{font-family:'Rajdhani',sans-serif;font-size:.92rem;font-weight:600;color:#ffd700;margin-bottom:5px;}
+.annbody{font-size:.81rem;color:var(--tx);line-height:1.5;}
+.annmeta{font-size:.68rem;color:var(--mu);margin-top:5px;}
+
+/* FOLLOW */
+.followbtn{padding:4px 13px;border-radius:20px;font-size:.73rem;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .15s;}
+.fb-on{background:rgba(0,245,160,0.1);color:var(--gr);border:1px solid rgba(0,245,160,0.3);}
+.fb-off{background:var(--gr);color:#001a0e;}
+
+/* ADMIN */
+.ulirow{display:flex;align-items:center;gap:9px;padding:9px 13px;background:var(--s1);border:1px solid var(--br);border-radius:var(--r);margin-bottom:7px;}
+.uliname{flex:1;font-size:.81rem;}
+.banbtn{background:rgba(255,64,64,0.1);border:1px solid rgba(255,64,64,0.3);color:var(--rd);border-radius:5px;padding:3px 9px;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif;}
+.unbanbtn{background:rgba(0,245,160,0.1);border:1px solid rgba(0,245,160,0.3);color:var(--gr);border-radius:5px;padding:3px 9px;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif;}
+.promobtn{background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.3);color:var(--bl);border-radius:5px;padding:3px 9px;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif;margin-right:3px;}
+.demobtn{background:rgba(255,150,0,0.1);border:1px solid rgba(255,150,0,0.3);color:#ff9040;border-radius:5px;padding:3px 9px;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif;margin-right:3px;}
+
+/* EDITOR */
+.edwrap{display:grid;grid-template-columns:1fr 270px;gap:14px;}
+.edpreview{background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:18px;}
+#editCanvas{width:100%;display:block;border-radius:var(--r);background:#000;}
+.ednovideo{width:100%;height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;color:var(--mu);font-size:.83rem;cursor:pointer;background:var(--s3);border-radius:var(--r);border:2px dashed rgba(0,245,160,0.2);}
+.tlwrap{background:var(--s3);border-radius:var(--r);padding:11px;margin-top:11px;}
+.tllabel{font-size:.68rem;color:var(--mu);margin-bottom:5px;display:flex;justify-content:space-between;}
+.tltrack{position:relative;height:38px;background:var(--s2);border-radius:6px;overflow:hidden;cursor:pointer;margin-bottom:5px;}
+.tlfill{height:100%;background:linear-gradient(90deg,rgba(0,245,160,0.22),rgba(0,180,255,0.22));}
+.tls{position:absolute;top:0;bottom:0;left:0;width:11px;background:var(--gr);border-radius:3px 0 0 3px;cursor:ew-resize;z-index:2;}
+.tle{position:absolute;top:0;bottom:0;right:0;width:11px;background:var(--bl);border-radius:0 3px 3px 0;cursor:ew-resize;z-index:2;}
+.playhead{position:absolute;top:0;bottom:0;width:2px;background:#fff;z-index:3;pointer-events:none;left:0;}
+.edctrls{display:flex;gap:7px;align-items:center;margin-top:9px;}
+.edtime{font-family:'Rajdhani',sans-serif;font-size:.95rem;color:var(--mu);margin-left:auto;}
+.edpanel{background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:14px;overflow-y:auto;max-height:calc(100vh - 110px);}
+.edsec{border-bottom:1px solid var(--br);padding-bottom:13px;margin-bottom:13px;}
+.edsec:last-child{border-bottom:none;margin-bottom:0;}
+.edstitle{font-family:'Rajdhani',sans-serif;font-size:.92rem;font-weight:600;margin-bottom:9px;}
+.fltgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+.fltbtn{background:var(--s2);border:1px solid var(--br);border-radius:6px;padding:6px 3px;font-size:.67rem;color:var(--mu);cursor:pointer;text-align:center;transition:all .12s;}
+.fltbtn:hover{border-color:var(--gr);color:var(--tx);}
+.fltbtn.active{border-color:var(--gr);background:rgba(0,245,160,0.08);color:var(--gr);}
+.slrow{margin-bottom:7px;}
+.slrow label{display:flex;justify-content:space-between;font-size:.71rem;color:var(--mu);margin-bottom:3px;}
+.slrow label span{color:var(--tx);}
+.slrow input[type=range]{width:100%;accent-color:var(--gr);}
+.ovinput{width:100%;background:var(--s2);border:1px solid var(--br);border-radius:6px;color:var(--tx);padding:7px 9px;font-size:.8rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:6px;}
+.ovinput:focus{border-color:var(--gr);}
+.ovlist{display:flex;flex-direction:column;gap:3px;margin-top:5px;}
+.ovitem{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border-radius:5px;padding:4px 7px;font-size:.72rem;color:var(--mu);}
+.ovitem button{background:none;border:none;color:var(--rd);cursor:pointer;}
+.musiclist{display:flex;flex-direction:column;gap:4px;}
+.musicitem{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--s2);border:1px solid var(--br);border-radius:6px;cursor:pointer;transition:all .12s;font-size:.75rem;color:var(--mu);}
+.musicitem:hover{border-color:var(--gr);color:var(--tx);}
+.musicitem.active{border-color:var(--gr);background:rgba(0,245,160,0.06);color:var(--gr);}
+.cslist{display:flex;flex-direction:column;gap:4px;max-height:140px;overflow-y:auto;margin-bottom:7px;}
+.csitem{display:flex;align-items:center;gap:7px;padding:5px 9px;background:var(--s2);border:1px solid var(--br);border-radius:6px;cursor:pointer;font-size:.75rem;color:var(--mu);transition:all .12s;}
+.csitem:hover{border-color:var(--bl);color:var(--tx);}
+.csitem.selected{border-color:var(--gr);color:var(--gr);background:rgba(0,245,160,0.06);}
+.mqlist{display:flex;flex-direction:column;gap:3px;margin-top:5px;}
+.mqitem{background:var(--s3);border-radius:5px;padding:4px 9px;font-size:.72rem;color:var(--mu);display:flex;justify-content:space-between;align-items:center;}
+.mqitem button{background:none;border:none;color:var(--rd);cursor:pointer;}
+@media(max-width:900px){.edwrap{grid-template-columns:1fr;}}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:9px;margin-bottom:16px;flex-wrap:wrap;}
+.swrap{position:relative;flex:1;min-width:170px;max-width:270px;}
+.swrap input{width:100%;padding:7px 11px 7px 30px;background:var(--s2);border:1px solid var(--br);border-radius:7px;color:var(--tx);font-size:.8rem;font-family:'Inter',sans-serif;outline:none;transition:border .15s;}
+.swrap input:focus{border-color:rgba(0,245,160,0.4);}
+.sicon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--mu);font-size:.8rem;}
+.fsel{background:var(--s2);border:1px solid var(--br);color:var(--tx);padding:6px 11px;border-radius:7px;font-size:.8rem;font-family:'Inter',sans-serif;cursor:pointer;outline:none;}
+
+/* FLOAT REC */
+#floatRecBtn{position:fixed;bottom:110px;right:22px;z-index:9990;background:var(--rd);color:#fff;border:none;border-radius:50px;padding:12px 20px;font-size:.87rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;display:none;align-items:center;gap:7px;box-shadow:0 4px 24px rgba(255,64,64,0.5);animation:fpulse 1.5s infinite;}
+#floatRecBtn.show{display:flex;}
+@keyframes fpulse{0%,100%{box-shadow:0 4px 24px rgba(255,64,64,0.5)}50%{box-shadow:0 4px 36px rgba(255,64,64,0.9)}}
+.frdot{width:9px;height:9px;border-radius:50%;background:#fff;animation:blink 1s infinite;}
+
+/* TOAST */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s2);border:1px solid var(--br);color:var(--tx);padding:9px 18px;border-radius:8px;font-size:.82rem;z-index:99999;transition:transform .3s;white-space:nowrap;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.success{border-color:rgba(0,245,160,0.4);color:var(--gr);}
+#toast.error{border-color:rgba(255,64,64,0.4);color:var(--rd);}
+
+/* EMPTY */
+.empty{text-align:center;padding:56px 18px;color:var(--mu);}
+.emptyicon{font-size:2.8rem;margin-bottom:10px;}
+.empty h3{font-family:'Rajdhani',sans-serif;font-size:1.1rem;color:var(--tx);margin-bottom:5px;}
+.empty p{font-size:.82rem;}
+
+/* MOBILE */
+.mobnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:400;background:var(--s1);border-top:1px solid var(--br);padding:5px 0 8px;}
+.mobnavinner{display:flex;justify-content:space-around;align-items:center;}
+.mobtab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 7px;border:none;background:none;color:var(--mu);font-size:.56rem;font-family:'Inter',sans-serif;cursor:pointer;transition:color .15s;min-width:42px;}
+.mobtab .mi{font-size:1.2rem;line-height:1;}
+.mobtab.active{color:var(--gr);}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px;}
+@media(max-width:768px){.sidebar{display:none;}.statsrow{grid-template-columns:repeat(2,1fr);}.cgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}.recopts{grid-template-columns:1fr;}.hnav{display:none;}.hright .btnd{display:none;}.main{padding:13px;padding-bottom:82px;}.mobnav{display:block;}#floatRecBtn{bottom:82px;}#facecam{bottom:82px;}}
+</style>
+</head>
+<body>
+<input type="file" id="fileInput" accept="video/*,image/*" multiple style="display:none">
+<input type="file" id="screenshotInput" accept="image/*" multiple style="display:none">
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo"><span class="a">Arena</span><span class="c">Clips</span></div>
+    <div class="auth-sub">Sign in to upload, post and interact 🎮</div>
+    <div id="authLogin">
+      <button class="abtn abtn-gg" onclick="googleLogin()"><svg width="17" height="17" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z"/></svg>Continue with Google</button>
+      <div class="auth-err" id="loginErr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- GAMERTAG PICKER -->
+<div id="gamertagScreen" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;">
+  <div class="auth-box" style="text-align:center;">
+    <div style="font-size:2rem;margin-bottom:8px;">🎮</div>
+    <div class="auth-logo" style="margin-bottom:6px;"><span class="a">Arena</span><span class="c">Clips</span></div>
+    <div class="auth-sub" style="margin-bottom:20px;">Pick your gamertag! This is how everyone will know you.</div>
+    <input class="auth-input" id="gamertagInput" type="text" placeholder="xX_YourTag_Xx" maxlength="20" style="text-align:center;font-size:1rem;letter-spacing:.05em;">
+    <div style="font-size:.72rem;color:var(--mu);margin-bottom:14px;">Max 20 characters. No spaces.</div>
+    <button class="abtn abtn-g" onclick="saveGamertag()">🚀 Let's Go!</button>
+    <div class="auth-err" id="gamertagErr"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div class="logo"><span class="a">Arena</span><span class="c">Clips</span><span class="logo-tag">BETA</span></div>
+    <nav class="hnav">
+      <button class="ntab active" onclick="switchTab('feed',this)">Feed</button>
+      <button class="ntab" onclick="switchTab('clips',this)">Clips</button>
+      <button class="ntab" onclick="switchTab('highlights',this)">Highlights</button>
+      <button class="ntab" onclick="switchTab('screenshots',this)">Screenshots</button>
+      <button class="ntab" onclick="switchTab('games',this)">🎮 Games</button>
+      <button class="ntab" onclick="switchTab('leaderboard',this)">🏆 Leaderboard</button>
+      <button class="ntab" onclick="switchTab('recorder',this)">Recorder</button>
+      <button class="ntab" onclick="switchTab('editor',this)">✂️ Editor</button>
+      <button class="ntab" onclick="switchTab('stream',this)">Stream</button>
+      <button class="ntab" id="adminBtn" style="display:none" onclick="switchTab('admin',this)">👑 Admin</button>
+    </nav>
+  </div>
+  <div class="hright">
+    <div class="livebadge"><div class="ldot"></div><span id="liveCount">0 live</span></div>
+    <div class="notif-bell" onclick="toggleNotif()">🔔<div class="notif-count" id="notifCount"></div></div>
+    <button class="btn btnd" onclick="document.getElementById('fileInput').click()">+ Upload</button>
+    <button class="btn btng" onclick="switchTab('stream',document.querySelectorAll('.ntab')[8])">🎮 Go Live</button>
+    <div id="userBar" style="display:none;display:flex;align-items:center;gap:7px;">
+      <div class="uinitials" id="uInitials">?</div>
+      <div style="display:flex;flex-direction:column;gap:1px;">
+        <span style="font-size:.76rem;font-weight:500;" id="uName">User</span>
+        <span class="rbadge r-member" id="uRank">Member</span>
+      </div>
+      <button class="btn btnd" style="padding:4px 9px;font-size:.72rem;" onclick="signOutUser()">Sign Out</button>
+    </div>
+  </div>
+</header>
+
+<!-- NOTIFICATIONS PANEL -->
+<div id="notifPanel">
+  <div class="notifhdr">🔔 Notifications <button style="background:none;border:none;color:var(--mu);cursor:pointer;" onclick="toggleNotif()">✕</button></div>
+  <div id="notifList"><div style="padding:14px;font-size:.78rem;color:var(--mu);">No notifications yet</div></div>
+</div>
+
+<!-- FACECAM -->
+<div id="facecam"><video id="facecamVid" autoplay muted playsinline></video><button id="fcClose" onclick="toggleFacecam()">✕</button></div>
+
+<!-- CHAT BOXES -->
+<div class="chatbox" id="globalChat">
+  <div class="chathdr"><div class="chathtitle">💬 Global Chat</div><button class="chatclose" onclick="toggleChat('global')">✕</button></div>
+  <div class="chatmsgs" id="globalMsgs"></div>
+  <div class="chatinrow"><input class="chatin" id="globalInput" placeholder="Message..." onkeydown="if(event.key==='Enter')sendChat('global')"><button class="chatsend" onclick="sendChat('global')">Send</button></div>
+</div>
+<div class="chatbox" id="staffChat">
+  <div class="chathdr"><div class="chathtitle">🔒 Staff Yaps</div><button class="chatclose" onclick="toggleChat('staff')">✕</button></div>
+  <div class="chatmsgs" id="staffMsgs"></div>
+  <div class="chatinrow"><input class="chatin" id="staffInput" placeholder="Staff only..." onkeydown="if(event.key==='Enter')sendChat('staff')"><button class="chatsend" onclick="sendChat('staff')">Send</button></div>
+</div>
+<div class="chatbox" id="gameChat" style="left:22px;bottom:220px;">
+  <div class="chathdr"><div class="chathtitle" id="gameChatTitle">🎮 Game Chat</div><button class="chatclose" onclick="toggleChat('game')">✕</button></div>
+  <div class="chatmsgs" id="gameMsgs"></div>
+  <div class="chatinrow"><input class="chatin" id="gameInput" placeholder="Message..." onkeydown="if(event.key==='Enter')sendChat('game')"><button class="chatsend" onclick="sendChat('game')">Send</button></div>
+</div>
+
+<!-- CHAT TOGGLES -->
+<div class="chat-toggle-bar">
+  <button class="ctoggle" onclick="toggleChat('global')">💬 Chat <div class="cunread" id="globalUnread">0</div></button>
+  <button class="ctoggle" id="staffToggle" style="display:none" onclick="toggleChat('staff')">🔒 Staff Yaps <div class="cunread" id="staffUnread">0</div></button>
+  <button class="ctoggle" id="gameChatToggle" style="display:none" onclick="toggleChat('game')">🎮 <span id="gameChatBtnLabel">Game Chat</span></button>
+  <button class="ctoggle" onclick="toggleFacecam()">📷 Facecam</button>
+</div>
+
+<div class="appbody">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="ssec">
+      <div class="slabel">Library</div>
+      <div class="sitem active" onclick="switchTab('feed',null);setSA(this)">🏠 All Content <span class="sbadge" id="sb-all">0</span></div>
+      <div class="sitem" onclick="switchTab('clips',null);setSA(this)">🎬 Clips <span class="sbadge" id="sb-clips">0</span></div>
+      <div class="sitem" onclick="switchTab('highlights',null);setSA(this)">⭐ Highlights <span class="sbadge" id="sb-hl">0</span></div>
+      <div class="sitem" onclick="switchTab('screenshots',null);setSA(this)">📸 Screenshots <span class="sbadge" id="sb-shots">0</span></div>
+      <div class="sitem" onclick="switchTab('leaderboard',null);setSA(this)">🏆 Leaderboard</div>
+    </div>
+    <div class="ssec">
+      <div class="slabel">Tools</div>
+      <div class="sitem" onclick="switchTab('recorder',null);setSA(this)">⏺ Screen Recorder</div>
+      <div class="sitem" onclick="switchTab('editor',null);setSA(this)">✂️ Video Editor</div>
+      <div class="sitem" onclick="switchTab('stream',null);setSA(this)">📡 Live Stream</div>
+    </div>
+    <div class="ssec">
+      <div class="slabel">Games</div>
+      <div class="sitem" onclick="switchTab('games',null);setSA(this);selectGame('minecraft',null)">⛏️ Minecraft</div>
+      <div class="sitem" onclick="switchTab('games',null);setSA(this);selectGame('fortnite',null)">🏗️ Fortnite</div>
+      <div class="sitem" onclick="switchTab('games',null);setSA(this);selectGame('roblox',null)">🟥 Roblox</div>
+      <div class="sitem" onclick="switchTab('games',null);setSA(this);selectGame('valorant',null)">🎯 Valorant</div>
+    </div>
+    <div class="ssec" id="annSidebar" style="display:none">
+      <div class="slabel">📢 Announcements</div>
+      <div class="sitem" onclick="switchTab('announcements',null);setSA(this)">View All</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="upbar" id="uploadBar"><div class="upbar-lbl"><span id="uploadName">Uploading...</span><span id="uploadPct">0%</span></div><div class="ptrack"><div class="pfill" id="progressFill"></div></div></div>
+
+    <!-- FEED -->
+    <div class="tcon active" id="tab-feed">
+      <div class="statsrow">
+        <div class="statcard g"><div class="statlabel">Total Clips</div><div class="statval g" id="stat-clips">0</div></div>
+        <div class="statcard b"><div class="statlabel">Screenshots</div><div class="statval b" id="stat-shots">0</div></div>
+        <div class="statcard g"><div class="statlabel">Highlights</div><div class="statval g" id="stat-hl">0</div></div>
+        <div class="statcard b"><div class="statlabel">Total Files</div><div class="statval b" id="stat-total">0</div></div>
+      </div>
+      <!-- ANNOUNCEMENTS STRIP -->
+      <div id="annStrip"></div>
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+        <div style="font-size:1.8rem;margin-bottom:7px;">🎮</div>
+        <p>Drop clips, highlights &amp; screenshots here</p>
+        <small style="font-size:.73rem;color:var(--mu);">MP4, MOV, WebM, PNG, JPG supported</small>
+      </div>
+      <div class="sechdr">
+        <div><span class="sectitle">Recent Uploads</span><span style="font-size:.73rem;color:var(--mu);margin-left:8px;" id="feed-count"></span></div>
+        <select class="fsel" id="feedFilter" onchange="renderFeed()">
+          <option value="all">All types</option>
+          <option value="clip">Clips only</option>
+          <option value="screenshot">Screenshots only</option>
+        </select>
+      </div>
+      <div class="cgrid" id="feed-grid"></div>
+      <div class="empty" id="feed-empty" style="display:none"><div class="emptyicon">🎮</div><h3>No content yet</h3><p>Upload your first clip or screenshot!</p></div>
+    </div>
+
+    <!-- CLIPS -->
+    <div class="tcon" id="tab-clips">
+      <div class="toolbar">
+        <div class="swrap"><span class="sicon">🔍</span><input type="text" placeholder="Search clips..." oninput="renderClips(this.value)"></div>
+        <button class="btn btng" onclick="document.getElementById('fileInput').click()">+ Upload Clip</button>
+      </div>
+      <div class="cgrid" id="clips-grid"></div>
+      <div class="empty" id="clips-empty" style="display:none"><div class="emptyicon">🎬</div><h3>No clips yet</h3><p>Upload your first video clip</p></div>
+    </div>
+
+    <!-- HIGHLIGHTS -->
+    <div class="tcon" id="tab-highlights">
+      <div class="toolbar">
+        <div class="swrap"><span class="sicon">🔍</span><input type="text" placeholder="Search highlights..."></div>
+        <button class="btn btnb" onclick="document.getElementById('fileInput').click()">+ Add Highlight</button>
+      </div>
+      <div id="highlights-list"></div>
+      <div class="empty" id="hl-empty" style="display:none"><div class="emptyicon">⭐</div><h3>No highlights yet</h3><p>Star any clip to add it here</p></div>
+    </div>
+
+    <!-- SCREENSHOTS -->
+    <div class="tcon" id="tab-screenshots">
+      <div class="toolbar">
+        <div class="swrap"><span class="sicon">🔍</span><input type="text" placeholder="Search screenshots..." oninput="renderScreenshots(this.value)"></div>
+        <button class="btn btnd" onclick="document.getElementById('screenshotInput').click()">+ Upload Screenshot</button>
+      </div>
+      <div class="sgrid" id="shots-grid"></div>
+      <div class="empty" id="shots-empty" style="display:none"><div class="emptyicon">📸</div><h3>No screenshots yet</h3><p>Upload or capture your gaming moments</p></div>
+    </div>
+
+    <!-- GAMES -->
+    <div class="tcon" id="tab-games">
+      <div class="sechdr" style="margin-bottom:16px;"><div class="sectitle">🎮 Game Servers</div></div>
+      <div class="gamewrap">
+        <div class="gamecard active" id="gc-minecraft" onclick="selectGame('minecraft',this)"><div class="gameicon">⛏️</div><div class="gamename">Minecraft</div><div class="gamesub">Top servers</div></div>
+        <div class="gamecard" id="gc-fortnite" onclick="selectGame('fortnite',this)"><div class="gameicon">🏗️</div><div class="gamename">Fortnite</div><div class="gamesub">BR & Creative</div></div>
+        <div class="gamecard" id="gc-roblox" onclick="selectGame('roblox',this)"><div class="gameicon">🟥</div><div class="gamename">Roblox</div><div class="gamesub">Popular games</div></div>
+        <div class="gamecard" id="gc-valorant" onclick="selectGame('valorant',this)"><div class="gameicon">🎯</div><div class="gamename">Valorant</div><div class="gamesub">Maps & modes</div></div>
+      </div>
+      <div id="gameServerList"></div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="tcon" id="tab-leaderboard">
+      <div class="sechdr" style="margin-bottom:16px;"><div class="sectitle">🏆 Leaderboard</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:18px;">
+          <div style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:600;margin-bottom:12px;">❤️ Most Liked</div>
+          <div id="lb-liked"></div>
+        </div>
+        <div style="background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:18px;">
+          <div style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:600;margin-bottom:12px;">📤 Top Uploaders</div>
+          <div id="lb-uploaders"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANNOUNCEMENTS -->
+    <div class="tcon" id="tab-announcements">
+      <div class="sechdr" style="margin-bottom:16px;">
+        <div class="sectitle">📢 Announcements</div>
+        <button class="btn btng" id="newAnnBtn" style="display:none" onclick="showAnnForm()">+ New Announcement</button>
+      </div>
+      <div id="annForm" style="display:none;background:var(--s1);border:1px solid var(--br);border-radius:12px;padding:16px;margin-bottom:16px;">
+        <input class="ovinput" id="annTitle" placeholder="Announcement title...">
+        <textarea class="ovinput" id="annBody" placeholder="Write your announcement..." style="height:80px;resize:vertical;"></textarea>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btng" onclick="postAnnouncement()">Post</button>
+          <button class="btn btnd" onclick="document.getElementById('annForm').style.display='none'">Cancel</button>
+        </div>
+      </div>
+      <div id="annList"><div style="font-size:.82rem;color:var(--mu);">No announcements yet</div></div>
+    </div>
+
+    <!-- RECORDER -->
+    <div class="tcon" id="tab-recorder">
+      <div class="recpanel">
+        <div class="rechdr">
+          <div class="recicon"><div class="reccircle"></div></div>
+          <div><div class="rectitle">Screen Recorder</div><div class="recsub">Capture gameplay directly in your browser</div></div>
+        </div>
+        <div class="recopts">
+          <div class="recopt selected" onclick="selectRecMode('screen',this)"><div class="recopticon">🖥️</div><div class="recoptlbl">Full Screen</div><div class="recoptsub">Entire display</div></div>
+          <div class="recopt" onclick="selectRecMode('window',this)"><div class="recopticon">🪟</div><div class="recoptlbl">Window</div><div class="recoptsub">One window</div></div>
+          <div class="recopt" onclick="selectRecMode('tab',this)"><div class="recopticon">📑</div><div class="recoptlbl">Browser Tab</div><div class="recoptsub">This tab</div></div>
+        </div>
+        <div class="recacts">
+          <button class="btn btnr" id="recBtn" onclick="toggleRecording()">⏺ Start Recording</button>
+          <button class="btn btnd" onclick="takeScreenshot()">📸 Screenshot</button>
+          <button class="btn btnd" onclick="toggleFacecam()">📷 Facecam</button>
+          <button class="btn btnd" id="micBtn" onclick="toggleMicMonitor()">🎤 Mic Off</button>
+          <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+            <span style="font-size:.73rem;color:var(--mu);">Mic Vol</span>
+            <input type="range" min="0" max="100" value="80" style="width:80px;accent-color:var(--gr);" id="micVol" oninput="setMicVol(this.value)">
+          </div>
+          <div class="rectimer" id="recTimer">00:00</div>
+        </div>
+        <video id="recPreview" autoplay muted playsinline></video>
+      </div>
+      <div class="sechdr"><div class="sectitle">Recorded Clips</div></div>
+      <div class="cgrid" id="recordings-grid"></div>
+      <div class="empty" id="rec-empty" style="display:none"><div class="emptyicon">⏺</div><h3>No recordings yet</h3><p>Hit start to capture your gameplay</p></div>
+    </div>
+
+    <!-- EDITOR -->
+    <div class="tcon" id="tab-editor">
+      <div class="edwrap">
+        <div class="edpreview">
+          <div class="sechdr" style="margin-bottom:11px;">
+            <div class="sectitle">✂️ Video Editor</div>
+            <button class="btn btnd" onclick="document.getElementById('editFileInput').click()">📂 Load Clip</button>
+            <input type="file" id="editFileInput" accept="video/*" style="display:none" onchange="loadEditVideo(this)">
+          </div>
+          <canvas id="editCanvas" height="270"></canvas>
+          <div id="editorNoVideo" class="ednoVideo"><div style="font-size:1.9rem;">🎬</div><div>Click to load a video clip</div></div>
+          <video id="editVideo" style="display:none;" preload="metadata"></video>
+          <div class="tlwrap">
+            <div class="tllabel"><span>Trim</span><span id="trimInfo">Start: 0s — End: 0s</span></div>
+            <div class="tltrack" id="timelineTrack" onclick="seekTimeline(event)">
+              <div class="tlfill" id="timelineFill" style="width:100%;"></div>
+              <div class="tls" id="trimStart"></div>
+              <div class="tle" id="trimEnd"></div>
+              <div class="playhead" id="playhead"></div>
+            </div>
+            <div class="edctrls">
+              <button class="btn btnd" style="padding:5px 11px;" onclick="editPlay()">▶ Play</button>
+              <button class="btn btnd" style="padding:5px 11px;" onclick="editPause()">⏸ Pause</button>
+              <button class="btn btnd" style="padding:5px 11px;" onclick="playTrimmed()">▶ Preview Trim</button>
+              <div class="edtime" id="editTime">0:00 / 0:00</div>
+            </div>
+          </div>
+          <div style="margin-top:13px;padding-top:13px;border-top:1px solid var(--br);">
+            <button class="btn btng" style="width:100%;justify-content:center;" onclick="exportEdit()">⬇ Export Edited Clip</button>
+          </div>
+        </div>
+        <div class="edpanel">
+          <div class="edsec">
+            <div class="edstitle">🎨 Filters</div>
+            <div class="fltgrid">
+              <div class="fltbtn active" onclick="applyFilter('none',this)">None</div>
+              <div class="fltbtn" onclick="applyFilter('grayscale(100%)',this)">B&W</div>
+              <div class="fltbtn" onclick="applyFilter('sepia(80%)',this)">Sepia</div>
+              <div class="fltbtn" onclick="applyFilter('hue-rotate(180deg)',this)">Invert</div>
+              <div class="fltbtn" onclick="applyFilter('saturate(200%)',this)">Vivid</div>
+              <div class="fltbtn" onclick="applyFilter('contrast(150%) brightness(110%)',this)">Sharp</div>
+              <div class="fltbtn" onclick="applyFilter('brightness(130%)',this)">Bright</div>
+              <div class="fltbtn" onclick="applyFilter('hue-rotate(90deg) saturate(150%)',this)">Neon</div>
+              <div class="fltbtn" onclick="applyFilter('sepia(40%) saturate(180%) hue-rotate(310deg)',this)">Film</div>
+            </div>
+          </div>
+          <div class="edsec">
+            <div class="edstitle">🌈 Adjustments</div>
+            <div class="slrow"><label>Brightness <span id="bVal">100</span>%</label><input type="range" min="0" max="200" value="100" oninput="updateAdj('brightness',this.value,'bVal')"></div>
+            <div class="slrow"><label>Contrast <span id="cVal">100</span>%</label><input type="range" min="0" max="200" value="100" oninput="updateAdj('contrast',this.value,'cVal')"></div>
+            <div class="slrow"><label>Saturation <span id="sVal">100</span>%</label><input type="range" min="0" max="300" value="100" oninput="updateAdj('saturate',this.value,'sVal')"></div>
+            <div class="slrow"><label>Blur <span id="blVal">0</span>px</label><input type="range" min="0" max="10" value="0" oninput="updateAdj('blur',this.value,'blVal')"></div>
+          </div>
+          <div class="edsec">
+            <div class="edstitle">📝 Text Overlays</div>
+            <input class="ovinput" id="overlayText" placeholder="Enter text...">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px;">
+              <select class="fsel" id="overlayColor" style="font-size:.73rem;padding:5px;">
+                <option value="#ffffff">White</option>
+                <option value="#00f5a0">Neon Green</option>
+                <option value="#00b4ff">Electric Blue</option>
+                <option value="#ff4040">Red</option>
+                <option value="#ffcc00">Yellow</option>
+              </select>
+              <select class="fsel" id="overlaySize" style="font-size:.73rem;padding:5px;">
+                <option value="20">Small</option>
+                <option value="32" selected>Medium</option>
+                <option value="48">Large</option>
+              </select>
+            </div>
+            <button class="btn btnd" style="width:100%;justify-content:center;margin-bottom:5px;" onclick="addOverlay()">+ Add Text</button>
+            <div class="ovlist" id="overlayList"></div>
+          </div>
+          <div class="edsec">
+            <div class="edstitle">🎵 Background Music</div>
+            <div class="musiclist">
+              <div class="musicitem active" onclick="selMusic('none',this)">🔇 No Music</div>
+              <div class="musicitem" onclick="selMusic('epic',this)">🎮 Epic Gaming</div>
+              <div class="musicitem" onclick="selMusic('chill',this)">🌊 Chill Beats</div>
+              <div class="musicitem" onclick="selMusic('hype',this)">⚡ Hype Mode</div>
+              <div class="musicitem" onclick="selMusic('lofi',this)">🎧 Lo-Fi</div>
+            </div>
+            <div class="slrow" style="margin-top:7px;"><label>Volume <span id="mVolVal">50</span>%</label><input type="range" min="0" max="100" value="50" oninput="document.getElementById('mVolVal').textContent=this.value"></div>
+            <input type="file" id="customAudio" accept="audio/*" style="display:none" onchange="loadCustomAudio(this)">
+            <button class="btn btnd" style="width:100%;justify-content:center;margin-top:5px;font-size:.73rem;" onclick="document.getElementById('customAudio').click()">📁 Upload Audio</button>
+            <div id="audioFileName" style="font-size:.7rem;color:var(--gr);margin-top:3px;display:none;"></div>
+            <audio id="bgAudio" loop></audio>
+          </div>
+          <div class="edsec">
+            <div class="edstitle">🔗 Merge Clips</div>
+            <div style="font-size:.73rem;color:var(--mu);margin-bottom:7px;">Select clips to merge:</div>
+            <div class="cslist" id="mergeClipList"></div>
+            <div class="mqlist" id="mergeQueue"></div>
+            <button class="btn btnb" style="width:100%;justify-content:center;margin-top:7px;" onclick="startMerge()">🔗 Merge Selected</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STREAM -->
+    <div class="tcon" id="tab-stream">
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:14px;">
+        <div class="streampanel">
+          <div id="streamEmbedWrap" style="width:100%;border-radius:12px;overflow:hidden;background:#000;min-height:300px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--mu);">
+            <div style="font-size:2rem;">📡</div>
+            <div style="font-size:.88rem;">Click Go Live to start streaming</div>
+            <div style="font-size:.75rem;color:var(--mu);text-align:center;max-width:300px;">Your screen + webcam will be shared with viewers in real time</div>
+          </div>
+          <iframe id="streamFrame" style="display:none;width:100%;height:400px;border:none;border-radius:12px;" allow="camera;microphone;display-capture;fullscreen;speaker"></iframe>
+          <div class="streamctrls" style="margin-top:12px;">
+            <button class="btn btng" id="streamBtn" onclick="toggleStream()">🎮 Go Live</button>
+            <button class="btn btnd" onclick="toggleFacecam()">👤 Facecam</button>
+            <button class="btn btnd" onclick="shareStreamLink()">🔗 Share Link</button>
+            <div class="streaminfo">
+              <div class="streamstat">Duration: <span id="streamDur">00:00</span></div>
+              <div class="streamstat" id="liveStatDot" style="display:none;align-items:center;gap:4px;"><div class="ldot"></div><span style="color:var(--rd)">LIVE</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- STREAM LIVE CHAT -->
+        <div style="background:var(--s1);border:1px solid var(--br);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="padding:12px 14px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:8px;">
+            <div class="ldot"></div>
+            <span style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:600;">Stream Chat</span>
+          </div>
+          <div id="streamChatMsgs" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:5px;height:360px;"></div>
+          <div style="padding:8px 10px;border-top:1px solid var(--br);display:flex;gap:6px;">
+            <input id="streamChatInput" class="chatin" placeholder="Say something..." onkeydown="if(event.key==='Enter')sendStreamChat()">
+            <button class="chatsend" onclick="sendStreamChat()">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="tcon" id="tab-admin">
+      <div class="sechdr" style="margin-bottom:16px;"><div class="sectitle">👑 Admin Panel</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:18px;">
+          <div style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:600;margin-bottom:12px;">👥 All Users</div>
+          <div id="adminUserList"><div style="font-size:.8rem;color:var(--mu);">Loading...</div></div>
+        </div>
+        <div style="background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:18px;">
+          <div style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:600;margin-bottom:12px;">🚫 Banned Users</div>
+          <div id="adminBanList"><div style="font-size:.8rem;color:var(--mu);">No banned users</div></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- VIEWER MODAL -->
+<div id="viewerModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.95);flex-direction:column;align-items:center;justify-content:center;">
+  <div style="width:90%;max-width:1100px;display:grid;grid-template-columns:1fr 300px;gap:14px;">
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="ldot"></div>
+          <span style="font-family:Rajdhani,sans-serif;font-size:1.2rem;font-weight:600;" id="viewerStreamerName">Watching stream</span>
+          <span style="font-size:.72rem;color:var(--rd);background:rgba(255,64,64,0.1);padding:2px 8px;border-radius:4px;">LIVE</span>
+        </div>
+        <button class="btn btnd" onclick="closeViewer()">✕ Close</button>
+      </div>
+      <iframe id="viewerFrame" style="width:100%;height:420px;border:none;border-radius:12px;background:#000;" allow="camera;microphone;display-capture;fullscreen;speaker"></iframe>
+      <div style="font-size:.75rem;color:var(--mu);margin-top:8px;">👥 <span id="viewerViewerCount">?</span> watching</div>
+    </div>
+    <!-- VIEWER CHAT -->
+    <div style="background:var(--s1);border:1px solid var(--br);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:8px;">
+        <div class="ldot"></div>
+        <span style="font-family:Rajdhani,sans-serif;font-size:.95rem;font-weight:600;">Live Chat</span>
+      </div>
+      <div id="viewerChatMsgs" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:5px;height:360px;"></div>
+      <div style="padding:8px 10px;border-top:1px solid var(--br);display:flex;gap:6px;">
+        <input id="viewerChatInput" class="chatin" placeholder="Say something..." onkeydown="if(event.key==='Enter')sendStreamChat()">
+        <button class="chatsend" onclick="sendStreamChat()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lbox" id="lightbox">
+  <button class="lbclose" onclick="closeLB()">✕</button>
+  <button class="lbnav lbprev" onclick="navMedia(-1)">‹</button>
+  <button class="lbnav lbnext" onclick="navMedia(1)">›</button>
+  <video id="lbVideo" controls class="lbmedia" style="display:none;max-height:74vh;"></video>
+  <img id="lbImg" class="lbmedia" style="display:none;max-height:74vh;" alt="">
+  <div class="lbinfo">
+    <div class="lbtitle" id="lbTitle"></div>
+    <div class="lbmeta" id="lbMeta"></div>
+    <div class="lbacts">
+      <button class="btn btnd" onclick="dlCurrent()">⬇ Download</button>
+      <button class="btn btng" onclick="postCurrent()">🚀 Post</button>
+      <button class="btn btnd" onclick="toggleHL()">⭐ Highlight</button>
+      <button class="btn btnd" onclick="delCurrent()" style="color:var(--rd)">🗑 Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- FLOAT REC -->
+<button id="floatRecBtn" onclick="stopRecording()"><div class="frdot"></div> Stop Recording</button>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MOBILE NAV -->
+<nav class="mobnav">
+  <div class="mobnavinner">
+    <button class="mobtab active" onclick="switchMobTab('feed',this)"><span class="mi">🏠</span>Feed</button>
+    <button class="mobtab" onclick="switchMobTab('clips',this)"><span class="mi">🎬</span>Clips</button>
+    <button class="mobtab" onclick="switchMobTab('games',this)"><span class="mi">🎮</span>Games</button>
+    <button class="mobtab" onclick="switchMobTab('recorder',this)"><span class="mi">⏺</span>Record</button>
+    <button class="mobtab" onclick="switchMobTab('editor',this)"><span class="mi">✂️</span>Editor</button>
+    <button class="mobtab" onclick="switchMobTab('stream',this)"><span class="mi">📡</span>Stream</button>
+  </div>
+</nav>
+
+<script>
+const OWNER_EMAIL='hjaffar2012.yt@gmail.com';
+const CLOUD_NAME='drydjvirg';
+const UPLOAD_PRESET='arenclips_unsigned';
+const STAFF_RANKS=['owner','admin','mod'];
+
+let media=[],lbList=[],currentIdx=0;
+let currentUser=null,currentUserData=null;
+let recMode='screen',mediaRecorder=null,recChunks=[],recStream=null,recInterval=null,recSeconds=0;
+let isStreaming=false,streamInterval=null,streamSeconds=0,cameraStream=null;
+let facecamStream=null,micStream=null,micEnabled=false;
+let currentFilter='none',adjustments={brightness:100,contrast:100,saturate:100,blur:0};
+let textOverlays=[],selectedMusic='none',editorRAF=null;
+let trimStartPct=0,trimEndPct=100,editDuration=0;
+let isDragS=false,isDragE=false;
+let mergeQueue=[];
+let activeGame='minecraft',activeServer='';
+let chatListeners={};
+let notifications=[];
+let follows=[];
+
+// ── AUTH ───────────────────────────────────────────────────────────────
+function switchAuthTab(t,el){
+  document.querySelectorAll('.auth-tab').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('authLogin').style.display=t==='login'?'':'none';
+  document.getElementById('authReg').style.display=t==='register'?'':'none';
+}
+
+async function googleLogin(){
+  try{
+    const r=await window._au.signInWithPopup(window._auth,window._gp);
+    await setupProfile(r.user);
+  }catch(e){showErr('loginErr',e.message);}
+}
+
+async function setupProfile(user,username){
+  const {doc,getDoc,setDoc}=window._fb;
+  const ref=doc(window._db,'arena_users',user.uid);
+  const snap=await getDoc(ref);
+  const isOwner=user.email===OWNER_EMAIL;
+  if(!snap.exists()){
+    // New user — show gamertag picker
+    window._pendingUser=user;
+    window._isOwner=isOwner;
+    document.getElementById('authScreen').style.display='none';
+    const gs=document.getElementById('gamertagScreen');
+    gs.style.display='flex';
+    return;
+  } else if(isOwner&&snap.data().rank!=='owner'){
+    await setDoc(ref,{rank:'owner'},{merge:true});
+  }
+  const updated=await getDoc(ref);
+  currentUserData=updated.data();
+  if(currentUserData.banned){
+    const bu=currentUserData.bannedUntil;
+    if(bu&&new Date(bu)<new Date()){
+      const {doc:d,updateDoc}=window._fb;
+      await updateDoc(d(window._db,'arena_users',user.uid),{banned:false,bannedUntil:null});
+      currentUserData.banned=false;
+    } else {
+      await window._au.signOut(window._auth);
+      const msg=bu?`You are banned until ${new Date(bu).toLocaleDateString()}`:'You have been permanently banned.';
+      document.getElementById('authScreen').style.display='flex';
+      showErr('loginErr',msg);
+      return;
+    }
+  }
+  currentUser=user;
+  onLoggedIn();
+}
+
+async function saveGamertag(){
+  const tag=document.getElementById('gamertagInput').value.trim().replace(/\s/g,'');
+  if(!tag){showErr('gamertagErr','Please enter a gamertag!');return;}
+  if(tag.length<3){showErr('gamertagErr','Gamertag must be at least 3 characters');return;}
+  const user=window._pendingUser;
+  const isOwner=window._isOwner;
+  const {doc,setDoc}=window._fb;
+  const ref=doc(window._db,'arena_users',user.uid);
+  await setDoc(ref,{uid:user.uid,email:user.email,username:tag,photoURL:user.photoURL||'',rank:isOwner?'owner':'member',banned:false,bannedUntil:null,joinedAt:new Date().toISOString(),uploads:0,totalLikes:0,followers:[]});
+  document.getElementById('gamertagScreen').style.display='none';
+  const updated=await (await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')).getDoc(ref);
+  currentUserData=updated.data();
+  currentUser=user;
+  onLoggedIn();
+}
+
+function onLoggedIn(){
+  document.getElementById('authScreen').style.display='none';
+  const ub=document.getElementById('userBar');
+  ub.style.display='flex';
+  const init=(currentUserData.username||'U').substring(0,2).toUpperCase();
+  document.getElementById('uInitials').textContent=init;
+  document.getElementById('uName').textContent=currentUserData.username;
+  const rb=document.getElementById('uRank');
+  rb.textContent=currentUserData.rank.charAt(0).toUpperCase()+currentUserData.rank.slice(1);
+  rb.className='rbadge r-'+currentUserData.rank;
+  if(['owner','admin'].includes(currentUserData.rank)){
+    document.getElementById('adminBtn').style.display='';
+    document.getElementById('newAnnBtn').style.display='';
+    document.getElementById('annSidebar').style.display='';
+    loadAdminPanel();
+  }
+  if(STAFF_RANKS.includes(currentUserData.rank)){
+    document.getElementById('staffToggle').style.display='';
+  }
+  loadMedia();
+  loadChats();
+  loadNotifications();
+  loadAnnouncements();
+  loadLeaderboard();
+  loadLiveStreamers();
+  toast('Welcome, '+currentUserData.username+'! 🎮','success');
+}
+
+async function signOutUser(){
+  await window._au.signOut(window._auth);
+  currentUser=null;currentUserData=null;
+  document.getElementById('authScreen').style.display='flex';
+  document.getElementById('userBar').style.display='none';
+  document.getElementById('adminBtn').style.display='none';
+  media=[];renderAll();
+}
+
+function showErr(id,msg){
+  const el=document.getElementById(id);
+  if(el){el.textContent=msg;}
+}
+
+// ── MEDIA LOAD ─────────────────────────────────────────────────────────
+function loadMedia(){
+  const {onSnapshot,query,orderBy,collection}=window._fb;
+  const q=query(collection(window._db,'arena_media'),orderBy('uploadedAt','desc'));
+  onSnapshot(q,snap=>{
+    media=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderAll();updateStats();
+  });
+}
+
+// ── UPLOAD ─────────────────────────────────────────────────────────────
+document.getElementById('fileInput').addEventListener('change',e=>handleFiles(e.target.files));
+document.getElementById('screenshotInput').addEventListener('change',e=>handleFiles(e.target.files,'screenshot'));
+const dz=document.getElementById('dropzone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');handleFiles(e.dataTransfer.files);});
+
+async function handleFiles(files,forceType){
+  if(!currentUser){toast('Please sign in first','error');return;}
+  for(const f of files) await uploadToCloud(f,forceType);
+}
+
+function getType(file,forceType){
+  if(forceType)return forceType;
+  return file.type.startsWith('video/')?'clip':'screenshot';
+}
+
+async function uploadToCloud(file,forceType,extra={}){
+  const type=getType(file,forceType);
+  const bar=document.getElementById('uploadBar');
+  const fill=document.getElementById('progressFill');
+  bar.classList.add('show');
+  document.getElementById('uploadName').textContent=file.name;
+  const fd=new FormData();
+  fd.append('file',file);
+  fd.append('upload_preset',UPLOAD_PRESET);
+  fd.append('folder','arenclips');
+  const rt=file.type.startsWith('video/')?'video':'image';
+  const url=`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
+  return new Promise((res,rej)=>{
+    const xhr=new XMLHttpRequest();
+    xhr.open('POST',url);
+    xhr.upload.onprogress=e=>{if(e.lengthComputable){const p=Math.round(e.loaded/e.total*100);fill.style.width=p+'%';document.getElementById('uploadPct').textContent=p+'%';}};
+    xhr.onload=async()=>{
+      bar.classList.remove('show');fill.style.width='0%';
+      if(xhr.status===200){
+        const r=JSON.parse(xhr.responseText);
+        const {addDoc,collection,serverTimestamp}=window._fb;
+        await addDoc(collection(window._db,'arena_media'),{name:file.name,src:r.secure_url,publicId:r.public_id,type,size:file.size,starred:false,posted:false,likes:0,views:0,uploadedBy:currentUser.uid,uploaderName:currentUserData.username,uploadedAt:serverTimestamp(),...extra});
+        const {doc,updateDoc,getDoc}=window._fb;
+        const uref=doc(window._db,'arena_users',currentUser.uid);
+        const usnap=await getDoc(uref);
+        if(usnap.exists()) await updateDoc(uref,{uploads:(usnap.data().uploads||0)+1});
+        toast('Uploaded: '+file.name,'success');
+        res(r.secure_url);
+      } else {
+        const err=JSON.parse(xhr.responseText);
+        toast('Upload failed: '+(err.error?.message||'Unknown error'),'error');
+        rej(err);
+      }
+    };
+    xhr.onerror=()=>{bar.classList.remove('show');toast('Upload failed','error');rej();};
+    xhr.send(fd);
+  });
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────
+function renderAll(){renderFeed();renderClips();renderScreenshots();renderHighlights();renderRecordings();populateMergeList();}
+
+function updateStats(){
+  const clips=media.filter(m=>m.type==='clip').length;
+  const shots=media.filter(m=>m.type==='screenshot').length;
+  const hl=media.filter(m=>m.starred).length;
+  document.getElementById('stat-clips').textContent=clips;
+  document.getElementById('stat-shots').textContent=shots;
+  document.getElementById('stat-hl').textContent=hl;
+  document.getElementById('stat-total').textContent=media.length;
+  document.getElementById('sb-all').textContent=media.length;
+  document.getElementById('sb-clips').textContent=clips;
+  document.getElementById('sb-shots').textContent=shots;
+  document.getElementById('sb-hl').textContent=hl;
+}
+
+function thumb(m){
+  if(m.type==='screenshot')return`<img src="${m.src}" alt="${m.name}" loading="lazy">`;
+  return`<video src="${m.src}" preload="metadata" muted></video>`;
+}
+
+function clipCard(m,idx,arr){
+  const bc=m.starred?'bh':m.type==='screenshot'?'bs':'bc';
+  const bl=m.starred?'⭐ Highlight':m.type==='screenshot'?'Screenshot':'Clip';
+  const ids=JSON.stringify(arr.map(x=>x.id)).replace(/"/g,"'");
+  const isOwn=currentUser&&m.uploadedBy===currentUser.uid;
+  const isDraft=!m.posted;
+  const likes=m.likes||0;
+  const views=m.views||0;
+  const draftOverlay=isDraft&&isOwn?`<div class="draft-overlay"><div class="draft-label">🔒 Draft — only you see this</div><button class="btn btng" style="font-size:.72rem;padding:5px 12px;" onclick="event.stopPropagation();postMedia('${m.id}')">🚀 Post</button></div>`:'';
+  if(isDraft&&!isOwn)return'';
+  return`<div class="ccard" onclick="openLB(${idx},${ids})">
+    <div class="cthumb" style="position:relative;">${thumb(m)}<div class="coverlay"><div class="playbtn"><div class="playtri"></div></div></div><span class="cbadge ${bc}">${bl}</span>${draftOverlay}</div>
+    <div class="cinfo">
+      <div class="ctitle">${m.name}</div>
+      <div class="cmeta"><span style="font-size:.68rem;">${m.uploaderName||''}</span><span style="display:flex;align-items:center;gap:7px;"><button class="likebtn${m.likedByMe?' liked':''}" onclick="event.stopPropagation();toggleLike('${m.id}')">❤️ ${likes}</button><span>👁 ${views}</span></span></div>
+    </div>
+    <div class="cacts">
+      <button class="cact" onclick="event.stopPropagation();toggleStar('${m.id}')" title="Highlight">⭐</button>
+      ${isOwn?`<button class="cact" onclick="event.stopPropagation();delMedia('${m.id}','${m.publicId||''}')" title="Delete">🗑</button>`:''}
+    </div>
+  </div>`;
+}
+
+function renderFeed(){
+  const f=document.getElementById('feedFilter')?.value||'all';
+  let posted=media.filter(m=>m.posted);
+  let drafts=currentUser?media.filter(m=>!m.posted&&m.uploadedBy===currentUser.uid):[];
+  if(f==='clip')posted=posted.filter(m=>m.type==='clip');
+  else if(f==='screenshot')posted=posted.filter(m=>m.type==='screenshot');
+  const grid=document.getElementById('feed-grid'),empty=document.getElementById('feed-empty');
+  document.getElementById('feed-count').textContent=posted.length?`(${posted.length})`:'';
+  let html='';
+  if(drafts.length){
+    html+=`<div style="margin-bottom:16px;"><div class="sechdr" style="margin-bottom:9px;"><span class="sectitle" style="color:#ffcc00;">🔒 Your Drafts</span><span style="font-size:.72rem;color:var(--mu);margin-left:7px;">(${drafts.length})</span></div><div class="cgrid" style="margin-bottom:0">${drafts.map((m,i)=>clipCard(m,i,drafts)).join('')}</div></div>`;
+  }
+  if(!posted.length){grid.innerHTML=html;empty.style.display=drafts.length?'none':'block';return;}
+  empty.style.display='none';
+  grid.innerHTML=html+posted.map((m,i)=>clipCard(m,i,posted)).join('');
+}
+
+function renderClips(s){
+  let list=media.filter(m=>m.type==='clip'&&(m.posted||(currentUser&&m.uploadedBy===currentUser.uid)));
+  if(s)list=list.filter(m=>m.name.toLowerCase().includes(s.toLowerCase()));
+  const grid=document.getElementById('clips-grid'),empty=document.getElementById('clips-empty');
+  if(!list.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=list.map((m,i)=>clipCard(m,i,list)).join('');
+}
+
+function renderScreenshots(s){
+  let list=media.filter(m=>m.type==='screenshot'&&(m.posted||(currentUser&&m.uploadedBy===currentUser.uid)));
+  if(s)list=list.filter(m=>m.name.toLowerCase().includes(s.toLowerCase()));
+  const grid=document.getElementById('shots-grid'),empty=document.getElementById('shots-empty');
+  if(!list.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const ids=JSON.stringify(list.map(x=>x.id)).replace(/"/g,"'");
+  grid.innerHTML=list.map((m,i)=>`<div class="scard" onclick="openLB(${i},${ids})"><div class="sthumb"><img src="${m.src}" alt="${m.name}" loading="lazy"></div><div class="sinfo"><div class="stitle">${m.name}</div><div class="sdate">${fmtDate(m.uploadedAt)}</div></div></div>`).join('');
+}
+
+function renderHighlights(){
+  const list=media.filter(m=>m.starred&&(m.posted||(currentUser&&m.uploadedBy===currentUser.uid)));
+  const c=document.getElementById('highlights-list'),e=document.getElementById('hl-empty');
+  if(!list.length){c.innerHTML='';e.style.display='block';return;}
+  e.style.display='none';
+  const ids=JSON.stringify(list.map(x=>x.id)).replace(/"/g,"'");
+  c.innerHTML=list.map((m,i)=>`<div style="display:flex;gap:12px;padding:13px;background:var(--s1);border:1px solid var(--br);border-radius:var(--r);margin-bottom:10px;cursor:pointer;" onclick="openLB(${i},${ids})">
+    <div style="width:130px;min-width:130px;height:75px;background:var(--s3);border-radius:7px;overflow:hidden;">${thumb(m)}</div>
+    <div><div style="font-size:.87rem;font-weight:500;margin-bottom:3px;">${m.name}</div><div style="font-size:.72rem;color:var(--mu);">${fmtDate(m.uploadedAt)} · ${fmtBytes(m.size)}</div><div style="display:flex;gap:5px;margin-top:7px;"><span style="font-size:.63rem;padding:2px 7px;border-radius:4px;background:rgba(0,245,160,0.1);color:var(--gr);">⭐ Highlight</span></div></div>
+  </div>`).join('');
+}
+
+function renderRecordings(){
+  const list=media.filter(m=>m.recorded);
+  const grid=document.getElementById('recordings-grid'),empty=document.getElementById('rec-empty');
+  if(!list.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=list.map((m,i)=>clipCard(m,i,list)).join('');
+}
+
+// ── LIGHTBOX ───────────────────────────────────────────────────────────
+function openLB(idx,idList){
+  if(typeof idList==='string')idList=JSON.parse(idList.replace(/'/g,'"'));
+  lbList=idList.map(id=>media.find(m=>m.id===id)).filter(Boolean);
+  currentIdx=idx;showLBItem();
+  document.getElementById('lightbox').classList.add('open');
+  const m=lbList[idx];
+  if(m&&!m.views){const{doc,updateDoc}=window._fb;updateDoc(doc(window._db,'arena_media',m.id),{views:(m.views||0)+1});}
+}
+function showLBItem(){
+  const m=lbList[currentIdx];if(!m)return;
+  const vid=document.getElementById('lbVideo'),img=document.getElementById('lbImg');
+  if(m.type==='clip'||m.recorded){vid.src=m.src;vid.style.display='';img.style.display='none';}
+  else{img.src=m.src;img.style.display='';vid.style.display='none';}
+  document.getElementById('lbTitle').textContent=m.name;
+  document.getElementById('lbMeta').textContent=fmtDate(m.uploadedAt)+' · '+fmtBytes(m.size)+' · '+m.uploaderName;
+}
+function navMedia(d){currentIdx=(currentIdx+d+lbList.length)%lbList.length;showLBItem();}
+function closeLB(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lbVideo').pause();}
+function dlCurrent(){const m=lbList[currentIdx];if(!m)return;const a=document.createElement('a');a.href=m.src;a.download=m.name;a.click();}
+async function postCurrent(){const m=lbList[currentIdx];if(!m)return;await postMedia(m.id);}
+async function toggleHL(){const m=lbList[currentIdx];if(!m)return;const{doc,updateDoc}=window._fb;await updateDoc(doc(window._db,'arena_media',m.id),{starred:!m.starred});toast(m.starred?'Removed from highlights':'⭐ Highlighted!','success');}
+async function delCurrent(){const m=lbList[currentIdx];if(!m)return;closeLB();await delMedia(m.id,m.publicId);}
+
+// ── POST / LIKE / STAR / DELETE ────────────────────────────────────────
+async function postMedia(id){
+  const{doc,updateDoc}=window._fb;
+  await updateDoc(doc(window._db,'arena_media',id),{posted:true});
+  toast('🚀 Posted! Everyone can see it!','success');
+}
+
+async function toggleLike(id){
+  if(!currentUser){toast('Sign in to like','error');return;}
+  const m=media.find(x=>x.id===id);if(!m)return;
+  const{doc,updateDoc}=window._fb;
+  const liked=m.likedByMe;
+  const newLikes=Math.max(0,(m.likes||0)+(liked?-1:1));
+  await updateDoc(doc(window._db,'arena_media',id),{likes:newLikes,likedByMe:!liked});
+  if(!liked&&m.uploadedBy&&m.uploadedBy!==currentUser.uid){
+    addNotification(m.uploadedBy,'❤️ '+currentUserData.username+' liked your clip "'+m.name+'"');
+    const{doc:d,updateDoc:u,getDoc:g}=window._fb;
+    const uref=d(window._db,'arena_users',m.uploadedBy);
+    const usnap=await g(uref);
+    if(usnap.exists())await u(uref,{totalLikes:(usnap.data().totalLikes||0)+1});
+  }
+}
+
+async function toggleStar(id){
+  const m=media.find(x=>x.id===id);if(!m)return;
+  const{doc,updateDoc}=window._fb;
+  await updateDoc(doc(window._db,'arena_media',id),{starred:!m.starred});
+  toast(m.starred?'Removed from highlights':'⭐ Highlighted!','success');
+}
+
+async function delMedia(id,publicId){
+  if(!confirm('Delete this file?'))return;
+  const{doc,deleteDoc}=window._fb;
+  await deleteDoc(doc(window._db,'arena_media',id));
+  toast('Deleted','error');
+}
+
+// ── NOTIFICATIONS ──────────────────────────────────────────────────────
+function loadNotifications(){
+  if(!currentUser)return;
+  const{onSnapshot,collection,query,orderBy,where}=window._fb;
+  const q=query(collection(window._db,'arena_notifs'),where('toUid','==',currentUser.uid),orderBy('createdAt','desc'));
+  onSnapshot(q,snap=>{
+    notifications=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderNotifications();
+  });
+}
+
+function renderNotifications(){
+  const unread=notifications.filter(n=>!n.read).length;
+  const nc=document.getElementById('notifCount');
+  nc.textContent=unread;
+  nc.className='notif-count'+(unread>0?' show':'');
+  const list=document.getElementById('notifList');
+  if(!notifications.length){list.innerHTML='<div style="padding:14px;font-size:.76rem;color:var(--mu);">No notifications yet</div>';return;}
+  list.innerHTML=notifications.slice(0,20).map(n=>`<div class="notifitem${n.read?'':' unread'}">${n.read?'':'🔵 '}${n.message}</div>`).join('');
+}
+
+async function addNotification(toUid,message){
+  const{addDoc,collection,serverTimestamp}=window._fb;
+  await addDoc(collection(window._db,'arena_notifs'),{toUid,message,read:false,createdAt:serverTimestamp()});
+}
+
+function toggleNotif(){
+  const p=document.getElementById('notifPanel');
+  p.classList.toggle('show');
+  if(p.classList.contains('show')&&notifications.length){
+    notifications.forEach(async n=>{
+      if(!n.read){const{doc,updateDoc}=window._fb;await updateDoc(doc(window._db,'arena_notifs',n.id),{read:true});}
+    });
+  }
+}
+
+// ── FOLLOW ─────────────────────────────────────────────────────────────
+async function followUser(targetUid,targetName){
+  if(!currentUser)return;
+  const{doc,getDoc,updateDoc,arrayUnion,arrayRemove}=window._fb;
+  const ref=doc(window._db,'arena_users',targetUid);
+  const snap=await getDoc(ref);
+  if(!snap.exists())return;
+  const followers=snap.data().followers||[];
+  const isFollowing=followers.includes(currentUser.uid);
+  if(isFollowing){
+    await updateDoc(ref,{followers:followers.filter(f=>f!==currentUser.uid)});
+    toast('Unfollowed '+targetName,'');
+  } else {
+    await updateDoc(ref,{followers:[...followers,currentUser.uid]});
+    addNotification(targetUid,'👥 '+currentUserData.username+' followed you!');
+    toast('Following '+targetName+'!','success');
+  }
+}
+
+// ── CHAT ───────────────────────────────────────────────────────────────
+function loadChats(){
+  loadChatRoom('global');
+  if(STAFF_RANKS.includes(currentUserData?.rank))loadChatRoom('staff');
+}
+
+function loadChatRoom(room){
+  if(chatListeners[room])return;
+  const{onSnapshot,query,orderBy,collection,where}=window._fb;
+  let q;
+  if(room==='global'){
+    q=query(collection(window._db,'arena_chat'),where('room','==','global'),orderBy('createdAt','asc'));
+  } else if(room==='staff'){
+    q=query(collection(window._db,'arena_chat'),where('room','==','staff'),orderBy('createdAt','asc'));
+  } else {
+    q=query(collection(window._db,'arena_chat'),where('room','==',room),orderBy('createdAt','asc'));
+  }
+  chatListeners[room]=onSnapshot(q,snap=>{
+    const msgs=snap.docs.map(d=>d.data());
+    renderChatMsgs(room,msgs);
+  });
+}
+
+function renderChatMsgs(room,msgs){
+  const ids={global:'globalMsgs',staff:'staffMsgs',game:'gameMsgs'};
+  const elId=ids[room]||(room.startsWith('game_')?'gameMsgs':null);
+  if(!elId)return;
+  const el=document.getElementById(elId);
+  if(!el)return;
+  el.innerHTML=msgs.slice(-100).map(m=>`<div class="chatmsg"><span class="cmsgname ${m.rank||'member'}">${m.username}</span><span>${m.text}</span></div>`).join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+async function sendChat(room){
+  if(!currentUser){toast('Sign in to chat','error');return;}
+  const inputIds={global:'globalInput',staff:'staffInput',game:'gameInput'};
+  const el=document.getElementById(inputIds[room]);
+  if(!el)return;
+  const text=el.value.trim();
+  if(!text)return;
+  if(room==='staff'&&!STAFF_RANKS.includes(currentUserData?.rank)){toast('Staff only!','error');return;}
+  const actualRoom=room==='game'?(activeServer?`game_${activeGame}_${activeServer.replace(/\s/g,'_')}`:activeGame):room;
+  const{addDoc,collection,serverTimestamp}=window._fb;
+  await addDoc(collection(window._db,'arena_chat'),{room:actualRoom,text,username:currentUserData.username,rank:currentUserData.rank,uid:currentUser.uid,createdAt:serverTimestamp()});
+  el.value='';
+}
+
+function toggleChat(room){
+  const ids={global:'globalChat',staff:'staffChat',game:'gameChat'};
+  const el=document.getElementById(ids[room]);
+  if(!el)return;
+  el.classList.toggle('show');
+  if(el.classList.contains('show')&&room==='game'&&activeServer){
+    loadChatRoom(`game_${activeGame}_${activeServer.replace(/\s/g,'_')}`);
+  }
+}
+
+// ── GAME SERVERS ───────────────────────────────────────────────────────
+const GAMES={
+  minecraft:{label:'Minecraft Servers',servers:[{n:'Hypixel',p:'150,000+'},{n:'CubeCraft',p:'30,000+'},{n:'Mineplex',p:'10,000+'},{n:'2b2t',p:'1,000+'},{n:'Complex Gaming',p:'8,000+'},{n:'MC Central',p:'5,000+'},{n:'Purple Prison',p:'3,000+'},{n:'Mineland',p:'12,000+'},{n:'Lunar Network',p:'25,000+'},{n:'The Hive',p:'20,000+'},{n:'Other Server',p:'Custom'}]},
+  fortnite:{label:'Fortnite Modes',servers:[{n:'Battle Royale',p:'Solo'},{n:'Duos',p:'2 players'},{n:'Squads',p:'4 players'},{n:'Zero Build',p:'No building'},{n:'Reload',p:'Fast pace'},{n:'Creative',p:'Custom maps'},{n:'LEGO Fortnite',p:'Survival'},{n:'Rocket Racing',p:'Racing'},{n:'Festival',p:'Music'},{n:'Custom Island',p:'Enter code'}]},
+  roblox:{label:'Roblox Games',servers:[{n:'Adopt Me',p:'500,000+'},{n:'Blox Fruits',p:'400,000+'},{n:'Brookhaven',p:'300,000+'},{n:'Pet Simulator',p:'200,000+'},{n:'Murder Mystery 2',p:'150,000+'},{n:'Tower of Hell',p:'100,000+'},{n:'Jailbreak',p:'80,000+'},{n:'Arsenal',p:'60,000+'},{n:'Royale High',p:'90,000+'},{n:'Other Game',p:'Custom'}]},
+  valorant:{label:'Valorant Modes',servers:[{n:'Unrated',p:'5v5'},{n:'Competitive',p:'Ranked'},{n:'Spike Rush',p:'Quick'},{n:'Deathmatch',p:'FFA'},{n:'Team Deathmatch',p:'5v5'},{n:'Escalation',p:'Gun game'},{n:'Replication',p:'Same agent'},{n:'Swift Play',p:'Fast'},{n:'Premier',p:'Tournament'},{n:'Custom Game',p:'Private'}]}
+};
+
+function selectGame(game,el){
+  activeGame=game;activeServer='';
+  document.querySelectorAll('.gamecard').forEach(c=>c.classList.remove('active'));
+  if(el)el.classList.add('active');
+  else{const gc=document.getElementById('gc-'+game);if(gc)gc.classList.add('active');}
+  renderGameServers();
+}
+
+function renderGameServers(){
+  const g=GAMES[activeGame];
+  const el=document.getElementById('gameServerList');
+  if(!el)return;
+  el.innerHTML=`<div class="sechdr" style="margin-bottom:11px;"><div class="sectitle">${g.label}</div></div>
+  <div class="srvlist">${g.servers.map(s=>`<div class="srvitem" onclick="selectServer('${s.n}',this)"><div class="srvdot"></div><span>${s.n}</span><span class="srvplayers">${s.p}</span></div>`).join('')}</div>
+  <div id="serverClips"></div>`;
+}
+
+function selectServer(name,el){
+  activeServer=name;
+  document.querySelectorAll('.srvitem').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  const roomKey=`game_${activeGame}_${name.replace(/\s/g,'_')}`;
+  document.getElementById('gameChatTitle').textContent='🎮 '+name+' Chat';
+  document.getElementById('gameChatBtnLabel').textContent=name+' Chat';
+  document.getElementById('gameChatToggle').style.display='';
+  loadChatRoom(roomKey);
+  const clips=media.filter(m=>m.posted&&m.game===activeGame&&m.server===name);
+  const sc=document.getElementById('serverClips');
+  if(sc){
+    if(!clips.length){sc.innerHTML=`<div style="font-size:.8rem;color:var(--mu);margin-top:10px;">No clips for ${name} yet — upload one!</div>`;return;}
+    sc.innerHTML=`<div class="sechdr" style="margin-top:14px;"><div class="sectitle">Clips for ${name}</div></div><div class="cgrid">${clips.map((m,i)=>clipCard(m,i,clips)).join('')}</div>`;
+  }
+}
+
+// ── LEADERBOARD ────────────────────────────────────────────────────────
+async function loadLeaderboard(){
+  const{getDocs,collection,query,orderBy}=window._fb;
+  const mediaSnap=await getDocs(query(collection(window._db,'arena_media'),orderBy('likes','desc')));
+  const topLiked=mediaSnap.docs.slice(0,10).map(d=>d.data());
+  const likedEl=document.getElementById('lb-liked');
+  if(likedEl){
+    likedEl.innerHTML=topLiked.map((m,i)=>`<div class="lbrow"><div class="lbnum ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div><div class="lbuinfo"><div class="lbuname">${m.name}</div><div class="lbustat">${m.uploaderName||'Unknown'}</div></div><div class="lbscore">❤️ ${m.likes||0}</div></div>`).join('')||'<div style="font-size:.8rem;color:var(--mu);">No clips yet</div>';
+  }
+  const usersSnap=await getDocs(query(collection(window._db,'arena_users'),orderBy('uploads','desc')));
+  const topUploaders=usersSnap.docs.slice(0,10).map(d=>d.data());
+  const ulEl=document.getElementById('lb-uploaders');
+  if(ulEl){
+    ulEl.innerHTML=topUploaders.map((u,i)=>`<div class="lbrow"><div class="lbnum ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div><div class="lbuinfo"><div class="lbuname">${u.username}</div><div class="lbustat"><span class="rbadge r-${u.rank}">${u.rank}</span></div></div><div class="lbscore">📤 ${u.uploads||0}</div></div>`).join('')||'<div style="font-size:.8rem;color:var(--mu);">No users yet</div>';
+  }
+}
+
+// ── ANNOUNCEMENTS ──────────────────────────────────────────────────────
+function loadAnnouncements(){
+  const{onSnapshot,query,orderBy,collection}=window._fb;
+  const q=query(collection(window._db,'arena_announcements'),orderBy('createdAt','desc'));
+  onSnapshot(q,snap=>{
+    const anns=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderAnnouncements(anns);
+    renderAnnStrip(anns);
+  });
+}
+
+function renderAnnouncements(anns){
+  const el=document.getElementById('annList');
+  if(!el)return;
+  if(!anns.length){el.innerHTML='<div style="font-size:.8rem;color:var(--mu);">No announcements yet</div>';return;}
+  el.innerHTML=anns.map(a=>`<div class="anncard"><div class="anntitle">📢 ${a.title}</div><div class="annbody">${a.body}</div><div class="annmeta">By ${a.authorName} · ${fmtDate(a.createdAt)}</div></div>`).join('');
+}
+
+function renderAnnStrip(anns){
+  const el=document.getElementById('annStrip');
+  if(!el||!anns.length)return;
+  const latest=anns[0];
+  el.innerHTML=`<div class="anncard" style="margin-bottom:16px;"><div class="anntitle">📢 ${latest.title}</div><div class="annbody">${latest.body}</div><div class="annmeta">By ${latest.authorName}</div></div>`;
+}
+
+function showAnnForm(){document.getElementById('annForm').style.display='block';}
+
+async function postAnnouncement(){
+  const title=document.getElementById('annTitle').value.trim();
+  const body=document.getElementById('annBody').value.trim();
+  if(!title||!body){toast('Fill in both fields','error');return;}
+  const{addDoc,collection,serverTimestamp}=window._fb;
+  await addDoc(collection(window._db,'arena_announcements'),{title,body,authorName:currentUserData.username,authorRank:currentUserData.rank,createdAt:serverTimestamp()});
+  document.getElementById('annTitle').value='';
+  document.getElementById('annBody').value='';
+  document.getElementById('annForm').style.display='none';
+  toast('📢 Announcement posted!','success');
+}
+
+// ── ADMIN ──────────────────────────────────────────────────────────────
+function loadAdminPanel(){
+  const{onSnapshot,collection}=window._fb;
+  onSnapshot(collection(window._db,'arena_users'),snap=>{
+    const users=snap.docs.map(d=>d.data());
+    renderAdminUsers(users.filter(u=>!u.banned));
+    renderBannedUsers(users.filter(u=>u.banned));
+  });
+}
+
+function renderAdminUsers(users){
+  const el=document.getElementById('adminUserList');if(!el)return;
+  if(!users.length){el.innerHTML='<div style="font-size:.8rem;color:var(--mu);">No users</div>';return;}
+  el.innerHTML=users.map(u=>`<div class="ulirow">
+    <div class="uinitials" style="width:26px;height:26px;font-size:.62rem;">${(u.username||'U').substring(0,2).toUpperCase()}</div>
+    <div class="uliname"><div style="font-size:.8rem;">${u.username}</div><div style="font-size:.68rem;color:var(--mu);">${u.email}</div></div>
+    <span class="rbadge r-${u.rank}">${u.rank}</span>
+    ${u.email!==OWNER_EMAIL&&(currentUserData?.rank==='owner'||(currentUserData?.rank==='admin'&&u.rank==='member'))?`
+      ${currentUserData?.rank==='owner'?`<button class="promobtn" onclick="promoteUser('${u.uid}','${u.rank}')">▲</button><button class="demobtn" onclick="demoteUser('${u.uid}','${u.rank}')">▼</button>`:''}
+      <button class="banbtn" onclick="showBanModal('${u.uid}','${u.username}')">Ban</button>
+    `:''}
+  </div>`).join('');
+}
+
+function renderBannedUsers(users){
+  const el=document.getElementById('adminBanList');if(!el)return;
+  if(!users.length){el.innerHTML='<div style="font-size:.8rem;color:var(--mu);">No banned users</div>';return;}
+  el.innerHTML=users.map(u=>`<div class="ulirow">
+    <div class="uinitials" style="width:26px;height:26px;font-size:.62rem;border-color:var(--rd);">${(u.username||'U').substring(0,2).toUpperCase()}</div>
+    <div class="uliname"><div style="font-size:.8rem;">${u.username}</div><div style="font-size:.68rem;color:var(--mu);">${u.bannedUntil?'Until: '+new Date(u.bannedUntil).toLocaleDateString():'Permanent'}</div></div>
+    <button class="unbanbtn" onclick="unbanUser('${u.uid}')">Unban</button>
+  </div>`).join('');
+}
+
+function showBanModal(uid,username){
+  const dur=prompt(`Ban ${username} for how long?\n\n1 = 1 day\n3 = 3 days\n7 = 1 week\n30 = 1 month\n0 = Permanent\n\nEnter number of days (or 0 for permanent):`);
+  if(dur===null)return;
+  const days=parseInt(dur);
+  banUser(uid,isNaN(days)?0:days);
+}
+
+async function banUser(uid,days){
+  const{doc,updateDoc}=window._fb;
+  const bannedUntil=days>0?new Date(Date.now()+days*86400000).toISOString():null;
+  await updateDoc(doc(window._db,'arena_users',uid),{banned:true,bannedUntil});
+  toast(days>0?`Banned for ${days} days`:'Permanently banned','error');
+}
+
+async function unbanUser(uid){
+  const{doc,updateDoc}=window._fb;
+  await updateDoc(doc(window._db,'arena_users',uid),{banned:false,bannedUntil:null});
+  toast('User unbanned','success');
+}
+
+const RANKS=['member','mod','admin','owner'];
+async function promoteUser(uid,current){
+  const idx=RANKS.indexOf(current);
+  if(idx>=2)return;
+  const{doc,updateDoc}=window._fb;
+  await updateDoc(doc(window._db,'arena_users',uid),{rank:RANKS[idx+1]});
+  toast('Promoted to '+RANKS[idx+1],'success');
+}
+async function demoteUser(uid,current){
+  const idx=RANKS.indexOf(current);
+  if(idx<=0)return;
+  const{doc,updateDoc}=window._fb;
+  await updateDoc(doc(window._db,'arena_users',uid),{rank:RANKS[idx-1]});
+  toast('Demoted to '+RANKS[idx-1],'');
+}
+
+// ── FACECAM ────────────────────────────────────────────────────────────
+async function toggleFacecam(){
+  const fc=document.getElementById('facecam');
+  if(facecamStream){
+    facecamStream.getTracks().forEach(t=>t.stop());
+    facecamStream=null;
+    fc.classList.remove('show');
+    toast('Facecam off','');
+  } else {
+    try{
+      facecamStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+      document.getElementById('facecamVid').srcObject=facecamStream;
+      fc.classList.add('show');
+      toast('Facecam on! 📷','success');
+    }catch(e){toast('Facecam error: '+e.message,'error');}
+  }
+}
+
+// Drag facecam
+let fcDragging=false,fcX=0,fcY=0;
+const fcEl=document.getElementById('facecam');
+fcEl.addEventListener('mousedown',e=>{if(e.target.id==='fcClose')return;fcDragging=true;fcX=e.clientX-fcEl.offsetLeft;fcY=e.clientY-fcEl.offsetTop;});
+document.addEventListener('mousemove',e=>{if(!fcDragging)return;fcEl.style.left=Math.max(0,Math.min(window.innerWidth-160,e.clientX-fcX))+'px';fcEl.style.bottom='auto';fcEl.style.top=Math.max(0,Math.min(window.innerHeight-100,e.clientY-fcY))+'px';});
+document.addEventListener('mouseup',()=>fcDragging=false);
+
+// ── MIC ────────────────────────────────────────────────────────────────
+async function toggleMicMonitor(){
+  const btn=document.getElementById('micBtn');
+  if(micStream){
+    micStream.getTracks().forEach(t=>t.stop());
+    micStream=null;micEnabled=false;
+    btn.textContent='🎤 Mic Off';
+    toast('Mic off','');
+  } else {
+    try{
+      micStream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+      micEnabled=true;
+      btn.textContent='🎤 Mic On';
+      toast('Mic on! 🎤','success');
+    }catch(e){toast('Mic error: '+e.message,'error');}
+  }
+}
+
+function setMicVol(val){
+  if(micStream){
+    micStream.getAudioTracks().forEach(t=>{if(t.getConstraints)t.applyConstraints({volume:val/100}).catch(()=>{});});
+  }
+}
+
+async function toggleStreamMic(){
+  const btn=document.getElementById('streamMicBtn');
+  if(cameraStream){
+    cameraStream.getAudioTracks().forEach(t=>{t.enabled=!t.enabled;});
+    const on=cameraStream.getAudioTracks()[0]?.enabled;
+    btn.textContent=on?'🎤 Mic On':'🎤 Mic Off';
+    toast(on?'Mic on':'Mic off','');
+  } else toast('Start camera first','error');
+}
+
+// ── RECORDER ───────────────────────────────────────────────────────────
+function selectRecMode(mode,el){recMode=mode;document.querySelectorAll('.recopt').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');}
+
+async function toggleRecording(){
+  if(mediaRecorder&&mediaRecorder.state==='recording')stopRecording();
+  else startRecording();
+}
+
+async function startRecording(){
+  try{
+    recStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
+    if(micStream&&micEnabled){
+      micStream.getAudioTracks().forEach(t=>recStream.addTrack(t));
+    }
+    const prev=document.getElementById('recPreview');
+    prev.srcObject=recStream;prev.classList.add('show');
+    recChunks=[];
+    const mime=getSupportedMime();
+    mediaRecorder=new MediaRecorder(recStream,mime?{mimeType:mime}:{});
+    mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recChunks.push(e.data);};
+    mediaRecorder.onstop=saveRecording;
+    mediaRecorder.start(1000);
+    recSeconds=0;
+    recInterval=setInterval(()=>{recSeconds++;const m=String(Math.floor(recSeconds/60)).padStart(2,'0'),s=String(recSeconds%60).padStart(2,'0');document.getElementById('recTimer').textContent=m+':'+s;},1000);
+    document.getElementById('recTimer').classList.add('show');
+    document.getElementById('recBtn').textContent='⏹ Stop';
+    document.getElementById('recBtn').classList.remove('btnr');document.getElementById('recBtn').classList.add('btnd');
+    document.getElementById('floatRecBtn').classList.add('show');
+    recStream.getVideoTracks()[0].onended=stopRecording;
+    toast('Recording started!','success');
+  }catch(e){toast('Could not start: '+e.message,'error');}
+}
+
+function stopRecording(){
+  if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
+  if(recStream)recStream.getTracks().forEach(t=>t.stop());
+  clearInterval(recInterval);
+  document.getElementById('recTimer').classList.remove('show');
+  document.getElementById('recPreview').classList.remove('show');
+  document.getElementById('floatRecBtn').classList.remove('show');
+  document.getElementById('recBtn').textContent='⏺ Start Recording';
+  document.getElementById('recBtn').classList.add('btnr');document.getElementById('recBtn').classList.remove('btnd');
+}
+
+async function saveRecording(){
+  const mime=getSupportedMime();
+  const ext=mime&&mime.includes('webm')?'webm':'mp4';
+  const blob=new Blob(recChunks,{type:mime||'video/webm'});
+  const file=new File([blob],`recording_${Date.now()}.${ext}`,{type:mime||'video/webm'});
+  toast('Saving recording...','');
+  await uploadToCloud(file,'clip',{recorded:true});
+}
+
+function getSupportedMime(){return['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4'].find(t=>MediaRecorder.isTypeSupported(t))||'';}
+
+async function takeScreenshot(){
+  try{
+    const stream=await navigator.mediaDevices.getDisplayMedia({video:true});
+    const track=stream.getVideoTracks()[0];
+    const vid=document.createElement('video');
+    vid.srcObject=stream;
+    await new Promise(r=>{vid.onloadedmetadata=r;});
+    vid.play();
+    await new Promise(r=>setTimeout(r,200));
+    const canvas=document.createElement('canvas');
+    canvas.width=vid.videoWidth;canvas.height=vid.videoHeight;
+    canvas.getContext('2d').drawImage(vid,0,0);
+    track.stop();
+    canvas.toBlob(async blob=>{
+      const file=new File([blob],`screenshot_${Date.now()}.png`,{type:'image/png'});
+      await uploadToCloud(file,'screenshot');
+    },'image/png');
+    toast('Screenshot captured!','success');
+  }catch(e){toast('Screenshot failed: '+e.message,'error');}
+}
+
+// ── STREAM ─────────────────────────────────────────────────────────────
+async function toggleCamera(){
+  const vid=document.getElementById('streamVideo'),ph=document.getElementById('streamPH');
+  if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;vid.srcObject=null;vid.classList.remove('show');ph.style.display='';toast('Camera off','');}
+  else{try{cameraStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});vid.srcObject=cameraStream;vid.classList.add('show');ph.style.display='none';toast('Camera on!','success');}catch(e){toast('Camera error: '+e.message,'error');}}
+}
+
+async function toggleStream(){
+  if(!currentUser){toast('Sign in first','error');return;}
+  isStreaming=!isStreaming;
+  const btn=document.getElementById('streamBtn'),dot=document.getElementById('liveStatDot');
+  const {doc,setDoc,serverTimestamp}=window._fb;
+  if(isStreaming){
+    try{
+      // Automatically ask for screen share — no extra clicks needed
+      screenStream=await navigator.mediaDevices.getDisplayMedia({video:{cursor:'always'},audio:true});
+      // Show preview to streamer
+      const wrap=document.getElementById('streamEmbedWrap');
+      const frame=document.getElementById('streamFrame');
+      wrap.style.display='none';
+      frame.style.display='none';
+      // Show live preview in the stream panel
+      let previewVid=document.getElementById('livePreviewVid');
+      if(!previewVid){
+        previewVid=document.createElement('video');
+        previewVid.id='livePreviewVid';
+        previewVid.autoplay=true;
+        previewVid.muted=true;
+        previewVid.playsInline=true;
+        previewVid.style.cssText='width:100%;border-radius:12px;background:#000;max-height:400px;';
+        wrap.parentNode.insertBefore(previewVid,wrap);
+      }
+      previewVid.srcObject=screenStream;
+      previewVid.style.display='block';
+      // Save stream data + base64 approach via Firebase
+      const roomName='AC'+currentUser.uid.substring(0,8);
+      await setDoc(doc(window._db,'arena_live',currentUser.uid),{
+        uid:currentUser.uid,username:currentUserData.username,
+        rank:currentUserData.rank,roomName,
+        startedAt:serverTimestamp(),isLive:true,viewers:0
+      });
+      loadStreamChat(currentUser.uid);
+      // If stream stops from browser UI
+      screenStream.getVideoTracks()[0].onended=()=>{if(isStreaming)toggleStream();};
+      btn.textContent='⏹ End Stream';btn.classList.remove('btng');btn.classList.add('btnr');
+      dot.style.display='flex';streamSeconds=0;
+      streamInterval=setInterval(()=>{streamSeconds++;const m=String(Math.floor(streamSeconds/60)).padStart(2,'0'),s=String(streamSeconds%60).padStart(2,'0');document.getElementById('streamDur').textContent=m+':'+s;},1000);
+      toast('🔴 You are LIVE! Viewers can now join your stream!','success');
+    }catch(e){
+      isStreaming=false;
+      toast('Could not start stream: '+e.message,'error');
+    }
+  } else {
+    if(screenStream)screenStream.getTracks().forEach(t=>t.stop());
+    screenStream=null;
+    const previewVid=document.getElementById('livePreviewVid');
+    if(previewVid){previewVid.srcObject=null;previewVid.style.display='none';}
+    document.getElementById('streamEmbedWrap').style.display='flex';
+    await setDoc(doc(window._db,'arena_live',currentUser.uid),{uid:currentUser.uid,isLive:false,viewers:0});
+    btn.textContent='🎮 Go Live';btn.classList.add('btng');btn.classList.remove('btnr');
+    dot.style.display='none';clearInterval(streamInterval);
+    document.getElementById('streamDur').textContent='00:00';
+    if(streamChatListener){streamChatListener();streamChatListener=null;}
+    toast('Stream ended','');
+  }
+}
+
+function loadLiveStreamers(){
+  const {onSnapshot,collection,query,where}=window._fb;
+  const q=query(collection(window._db,'arena_live'),where('isLive','==',true));
+  onSnapshot(q,snap=>{
+    const live=snap.docs.map(d=>d.data());
+    document.getElementById('liveCount').textContent=live.length+' live';
+    renderLiveSection(live);
+  });
+}
+
+function renderLiveSection(streamers){
+  const existing=document.getElementById('liveSection');
+  if(existing)existing.remove();
+  if(!streamers.length)return;
+  const feedGrid=document.getElementById('feed-grid');
+  if(!feedGrid)return;
+  const section=document.createElement('div');
+  section.id='liveSection';
+  section.style.cssText='margin-bottom:20px;';
+  section.innerHTML=`<div class="sechdr" style="margin-bottom:10px;"><span class="sectitle" style="color:var(--rd);">🔴 Live Now</span><span style="font-size:.72rem;color:var(--mu);margin-left:7px;">(${streamers.length})</span></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    ${streamers.map(s=>`
+      <div style="background:var(--s1);border:2px solid var(--rd);border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s;" onclick="watchStream('${s.uid}','${s.username}','${s.roomName||''}')" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='var(--s1)'">
+        <div class="uinitials" style="border-color:var(--rd);">${(s.username||'?').substring(0,2).toUpperCase()}</div>
+        <div><div style="font-size:.85rem;font-weight:600;">${s.username}</div><div style="display:flex;align-items:center;gap:5px;font-size:.7rem;color:var(--rd);"><div class="ldot"></div> LIVE</div></div>
+        <span class="rbadge r-${s.rank}">${s.rank}</span>
+        <span style="font-size:.72rem;color:var(--bl);margin-left:4px;">▶ Watch</span>
+      </div>`).join('')}
+  </div>`;
+  feedGrid.parentNode.insertBefore(section,feedGrid);
+}
+
+function shareStreamLink(){
+  const{doc,getDoc}=window._fb;
+  getDoc(doc(window._db,'arena_live',currentUser?.uid)).then(snap=>{
+    if(snap.exists()&&snap.data().roomUrl){
+      navigator.clipboard.writeText(snap.data().roomUrl).then(()=>toast('Stream link copied!','success'));
+    }
+  });
+}
+
+function shareLink(){const url=window.location.href;if(navigator.share)navigator.share({title:'ArenaClips',url});else navigator.clipboard.writeText(url).then(()=>toast('Link copied!','success'));}
+
+let streamChatStreamerUid='';
+let streamChatListener=null;
+
+function loadStreamChat(streamerUid){
+  streamChatStreamerUid=streamerUid;
+  if(streamChatListener)streamChatListener();
+  const {onSnapshot,query,orderBy,collection,where}=window._fb;
+  const q=query(collection(window._db,'arena_chat'),where('room','==','stream_'+streamerUid),orderBy('createdAt','asc'));
+  streamChatListener=onSnapshot(q,snap=>{
+    const msgs=snap.docs.map(d=>d.data());
+    ['streamChatMsgs','viewerChatMsgs'].forEach(id=>{
+      const el=document.getElementById(id);if(!el)return;
+      el.innerHTML=msgs.slice(-100).map(m=>`<div class="chatmsg"><span class="cmsgname ${m.rank||'member'}">${m.username}</span><span>${m.text}</span></div>`).join('');
+      el.scrollTop=el.scrollHeight;
+    });
+  });
+}
+
+async function sendStreamChat(){
+  if(!currentUser){toast('Sign in to chat','error');return;}
+  if(!streamChatStreamerUid){toast('No active stream','error');return;}
+  const input=document.getElementById('streamChatInput')||document.getElementById('viewerChatInput');
+  const text=input?.value.trim();if(!text)return;
+  const {addDoc,collection,serverTimestamp}=window._fb;
+  await addDoc(collection(window._db,'arena_chat'),{room:'stream_'+streamChatStreamerUid,text,username:currentUserData.username,rank:currentUserData.rank,uid:currentUser.uid,createdAt:serverTimestamp()});
+  if(input)input.value='';
+}
+
+async function watchStream(streamerUid,streamerName,roomName){
+  if(!currentUser){toast('Sign in to watch','error');return;}
+  document.getElementById('viewerStreamerName').textContent=streamerName;
+  document.getElementById('viewerModal').style.display='flex';
+  loadStreamChat(streamerUid);
+  if(!roomName){
+    const {doc,getDoc}=window._fb;
+    const snap=await getDoc(doc(window._db,'arena_live',streamerUid));
+    if(!snap.exists()||!snap.data().isLive){toast('Stream has ended','error');closeViewer();return;}
+    roomName=snap.data().roomName||'';
+    document.getElementById('viewerViewerCount').textContent=snap.data().viewers||0;
+  }
+  const frame=document.getElementById('viewerFrame');
+  frame.src=`https://meet.jit.si/${roomName}`;
+}
+
+function closeViewer(){
+  const frame=document.getElementById('viewerFrame');
+  frame.src='';
+  document.getElementById('viewerModal').style.display='none';
+  if(streamChatListener){streamChatListener();streamChatListener=null;}
+  streamChatStreamerUid='';
+}
+
+// ── VIDEO EDITOR ───────────────────────────────────────────────────────
+function loadEditVideo(input){
+  const file=input.files[0];if(!file)return;
+  const src=URL.createObjectURL(file);
+  const vid=document.getElementById('editVideo');
+  vid.src=src;
+  vid.onloadedmetadata=()=>{
+    editDuration=vid.duration;trimStartPct=0;trimEndPct=100;
+    document.getElementById('editorNoVideo').style.display='none';
+    const canvas=document.getElementById('editCanvas');
+    canvas.height=Math.round(canvas.offsetWidth*9/16);
+    updateTrimUI();startEditorLoop();toast('Clip loaded!','success');
+  };
+  populateMergeList();
+}
+
+function startEditorLoop(){
+  const vid=document.getElementById('editVideo');
+  const canvas=document.getElementById('editCanvas');
+  const ctx=canvas.getContext('2d');
+  function loop(){
+    if(vid.readyState>=2){
+      canvas.width=canvas.offsetWidth;
+      canvas.height=canvas.offsetHeight||Math.round(canvas.offsetWidth*9/16);
+      ctx.filter=buildFilter();
+      ctx.drawImage(vid,0,0,canvas.width,canvas.height);
+      drawOverlays(ctx,canvas.width,canvas.height);
+      updatePlayhead();updateEdTime();
+    }
+    editorRAF=requestAnimationFrame(loop);
+  }
+  if(editorRAF)cancelAnimationFrame(editorRAF);
+  loop();
+}
+
+function buildFilter(){
+  const a=adjustments;
+  let f=`brightness(${a.brightness}%) contrast(${a.contrast}%) saturate(${a.saturate}%)`;
+  if(a.blur>0)f+=` blur(${a.blur}px)`;
+  if(currentFilter!=='none')f+=' '+currentFilter;
+  return f;
+}
+
+function drawOverlays(ctx,w,h){
+  textOverlays.forEach(o=>{
+    ctx.save();
+    ctx.font=`bold ${o.size}px Rajdhani,sans-serif`;
+    ctx.fillStyle=o.color;
+    ctx.strokeStyle='rgba(0,0,0,0.8)';ctx.lineWidth=3;
+    ctx.textAlign='center';
+    ctx.strokeText(o.text,w*0.5,h*0.85);
+    ctx.fillText(o.text,w*0.5,h*0.85);
+    ctx.restore();
+  });
+}
+
+function updatePlayhead(){
+  const vid=document.getElementById('editVideo');if(!editDuration)return;
+  document.getElementById('playhead').style.left=(vid.currentTime/editDuration*100)+'%';
+}
+
+function updateEdTime(){
+  const vid=document.getElementById('editVideo');
+  document.getElementById('editTime').textContent=fmtTime(vid.currentTime)+' / '+fmtTime(editDuration);
+}
+
+function fmtTime(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+String(sec).padStart(2,'0');}
+
+function updateTrimUI(){
+  document.getElementById('trimStart').style.left=trimStartPct+'%';
+  document.getElementById('trimEnd').style.right=(100-trimEndPct)+'%';
+  const s=((trimStartPct/100)*editDuration).toFixed(1);
+  const e=((trimEndPct/100)*editDuration).toFixed(1);
+  document.getElementById('trimInfo').textContent=`Start: ${s}s — End: ${e}s`;
+}
+
+function seekTimeline(e){
+  const track=document.getElementById('timelineTrack');
+  const rect=track.getBoundingClientRect();
+  const pct=Math.max(0,Math.min(100,((e.clientX-rect.left)/rect.width)*100));
+  document.getElementById('editVideo').currentTime=(pct/100)*editDuration;
+}
+
+document.addEventListener('mousedown',e=>{if(e.target.id==='trimStart')isDragS=true;if(e.target.id==='trimEnd')isDragE=true;});
+document.addEventListener('mousemove',e=>{
+  if(!isDragS&&!isDragE)return;
+  const track=document.getElementById('timelineTrack');
+  const rect=track.getBoundingClientRect();
+  const pct=Math.max(0,Math.min(100,((e.clientX-rect.left)/rect.width)*100));
+  if(isDragS&&pct<trimEndPct-5){trimStartPct=pct;updateTrimUI();}
+  if(isDragE&&pct>trimStartPct+5){trimEndPct=pct;updateTrimUI();}
+});
+document.addEventListener('mouseup',()=>{isDragS=false;isDragE=false;});
+
+function editPlay(){const v=document.getElementById('editVideo');if(v.src)v.play();}
+function editPause(){document.getElementById('editVideo').pause();}
+function playTrimmed(){
+  const vid=document.getElementById('editVideo');if(!vid.src)return;
+  vid.currentTime=(trimStartPct/100)*editDuration;vid.play();
+  const end=(trimEndPct/100)*editDuration;
+  const c=setInterval(()=>{if(vid.currentTime>=end){vid.pause();clearInterval(c);}},100);
+}
+
+function applyFilter(f,el){
+  currentFilter=f;
+  document.querySelectorAll('.fltbtn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function updateAdj(prop,val,lid){adjustments[prop]=parseFloat(val);document.getElementById(lid).textContent=val;}
+
+function addOverlay(){
+  const text=document.getElementById('overlayText').value.trim();
+  if(!text){toast('Enter some text first!','error');return;}
+  textOverlays.push({text,color:document.getElementById('overlayColor').value,size:parseInt(document.getElementById('overlaySize').value),x:0.5,y:0.85});
+  document.getElementById('overlayText').value='';
+  renderOverlayList();toast('Text added!','success');
+}
+
+function renderOverlayList(){
+  document.getElementById('overlayList').innerHTML=textOverlays.map((o,i)=>`<div class="ovitem"><span style="color:${o.color};font-size:.8rem;">${o.text}</span><button onclick="removeOverlay(${i})">✕</button></div>`).join('');
+}
+
+function removeOverlay(i){textOverlays.splice(i,1);renderOverlayList();}
+
+function selMusic(name,el){
+  selectedMusic=name;
+  document.querySelectorAll('.musicitem').forEach(m=>m.classList.remove('active'));
+  el.classList.add('active');
+  const audio=document.getElementById('bgAudio');
+  if(name==='none'){audio.pause();audio.src='';return;}
+  toast('🎵 Music selected','success');
+}
+
+function loadCustomAudio(input){
+  const file=input.files[0];if(!file)return;
+  const url=URL.createObjectURL(file);
+  const audio=document.getElementById('bgAudio');
+  audio.src=url;audio.volume=parseInt(document.getElementById('mVolVal').textContent)/100;
+  document.getElementById('audioFileName').textContent='🎵 '+file.name;
+  document.getElementById('audioFileName').style.display='block';
+  document.querySelectorAll('.musicitem').forEach(m=>m.classList.remove('active'));
+  toast('Audio loaded: '+file.name,'success');
+}
+
+function populateMergeList(){
+  const clips=media.filter(m=>m.type==='clip');
+  const list=document.getElementById('mergeClipList');
+  if(!list)return;
+  if(!clips.length){list.innerHTML='<div style="font-size:.73rem;color:var(--mu);">No clips yet</div>';return;}
+  list.innerHTML=clips.map(c=>`<div class="csitem" onclick="toggleMergeClip('${c.id}','${c.name}',this)">🎬 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.name}</span></div>`).join('');
+}
+
+let mergeQueueArr=[];
+function toggleMergeClip(id,name,el){
+  const idx=mergeQueueArr.findIndex(x=>x.id===id);
+  if(idx>=0){mergeQueueArr.splice(idx,1);el.classList.remove('selected');}
+  else{mergeQueueArr.push({id,name});el.classList.add('selected');}
+  document.getElementById('mergeQueue').innerHTML=mergeQueueArr.map((c,i)=>`<div class="mqitem"><span>${i+1}. ${c.name}</span><button onclick="removeMergeClip('${c.id}')">✕</button></div>`).join('');
+}
+
+function removeMergeClip(id){
+  mergeQueueArr=mergeQueueArr.filter(x=>x.id!==id);
+  populateMergeList();
+  document.getElementById('mergeQueue').innerHTML=mergeQueueArr.map((c,i)=>`<div class="mqitem"><span>${i+1}. ${c.name}</span><button onclick="removeMergeClip('${c.id}')">✕</button></div>`).join('');
+}
+
+async function startMerge(){
+  if(mergeQueueArr.length<2){toast('Select at least 2 clips','error');return;}
+  toast('Merging clips...','');
+  const clips=mergeQueueArr.map(q=>media.find(m=>m.id===q.id)).filter(Boolean);
+  const canvas=document.createElement('canvas');canvas.width=1280;canvas.height=720;
+  const ctx=canvas.getContext('2d');
+  const stream=canvas.captureStream(30);
+  const mime=getSupportedMime();
+  const recorder=new MediaRecorder(stream,mime?{mimeType:mime}:{});
+  const chunks=[];
+  recorder.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+  recorder.onstop=async()=>{
+    const blob=new Blob(chunks,{type:mime||'video/webm'});
+    const file=new File([blob],`merged_${Date.now()}.webm`,{type:mime||'video/webm'});
+    await uploadToCloud(file,'clip',{});
+    toast('Merged clip saved!','success');
+    mergeQueueArr=[];
+    document.getElementById('mergeQueue').innerHTML='';
+    populateMergeList();
+  };
+  recorder.start();
+  for(const clip of clips){
+    await new Promise(resolve=>{
+      const vid=document.createElement('video');
+      vid.src=clip.src;vid.crossOrigin='anonymous';
+      vid.onloadeddata=()=>{
+        vid.play();
+        const draw=()=>{ctx.drawImage(vid,0,0,1280,720);if(!vid.ended&&!vid.paused)requestAnimationFrame(draw);else resolve();};
+        draw();
+      };
+      vid.onerror=resolve;
+    });
+  }
+  recorder.stop();
+}
+
+async function exportEdit(){
+  const vid=document.getElementById('editVideo');
+  if(!vid.src){toast('Load a clip first!','error');return;}
+  toast('Exporting...','');
+  const canvas=document.getElementById('editCanvas');
+  const stream=canvas.captureStream(30);
+  const mime=getSupportedMime();
+  const recorder=new MediaRecorder(stream,mime?{mimeType:mime}:{});
+  const chunks=[];
+  recorder.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+  recorder.onstop=async()=>{
+    const blob=new Blob(chunks,{type:mime||'video/webm'});
+    const file=new File([blob],`edited_${Date.now()}.webm`,{type:mime||'video/webm'});
+    await uploadToCloud(file,'clip',{});
+    toast('Exported & saved!','success');
+  };
+  const startTime=(trimStartPct/100)*editDuration;
+  const endTime=(trimEndPct/100)*editDuration;
+  vid.currentTime=startTime;
+  const audio=document.getElementById('bgAudio');
+  if(audio.src&&selectedMusic!=='none'){audio.currentTime=0;audio.volume=parseInt(document.getElementById('mVolVal').textContent)/100;audio.play();}
+  recorder.start();vid.play();
+  await new Promise(resolve=>{
+    const check=setInterval(()=>{if(vid.currentTime>=endTime||vid.ended){clearInterval(check);vid.pause();if(audio.src)audio.pause();resolve();}},100);
+  });
+  recorder.stop();
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────────────────
+function switchTab(name,el){
+  document.querySelectorAll('.tcon').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  const tab=document.getElementById('tab-'+name);
+  if(tab)tab.classList.add('active');
+  if(el)el.classList.add('active');
+  if(name==='leaderboard')loadLeaderboard();
+  if(name==='announcements')document.getElementById('newAnnBtn').style.display=['owner','admin'].includes(currentUserData?.rank)?'':'none';
+}
+
+function switchMobTab(name,el){
+  switchTab(name,null);
+  document.querySelectorAll('.mobtab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setSA(el){
+  document.querySelectorAll('.sitem').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── UTILS ──────────────────────────────────────────────────────────────
+function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'});}
+function fmtBytes(b){if(!b)return'—';if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB';}
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+type;setTimeout(()=>t.className='',2800);}
+
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('lightbox').classList.contains('open')){
+    if(e.key==='ArrowLeft')navMedia(-1);
+    if(e.key==='ArrowRight')navMedia(1);
+    if(e.key==='Escape')closeLB();
+  }
+});
+
+document.addEventListener('DOMContentLoaded',()=>{
+  selectGame('minecraft',null);
+  document.getElementById('editorNoVideo').style.display='flex';
+  document.getElementById('editCanvas').style.display='none';
+});
+
+document.getElementById('editVideo').addEventListener('loadedmetadata',()=>{
+  document.getElementById('editCanvas').style.display='block';
+  document.getElementById('editorNoVideo').style.display='none';
+});
+</script>
+</body>
+</html>
